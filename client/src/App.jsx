@@ -1,10 +1,10 @@
-import SearchPage from './pages/SearchPage';
+import SearchResultPage from './pages/SearchResultPage';
 import './index.css';
 
 function App() {
   return (
     <>
-      <SearchPage />
+      <SearchResultPage />
     </>
   );
 }
