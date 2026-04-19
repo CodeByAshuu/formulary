@@ -1,10 +1,10 @@
-import MedicineDetailPage from './pages/MedicineDetailPage';
+import SubstituteComparisonPage from './pages/SubstituteComparisonPage';
 import './index.css';
 
 function App() {
   return (
     <>
-      <MedicineDetailPage />
+      <SubstituteComparisonPage />
     </>
   );
 }
