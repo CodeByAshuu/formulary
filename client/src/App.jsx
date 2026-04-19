@@ -1,10 +1,10 @@
-import SearchResultPage from './pages/SearchResultPage';
+import MedicineDetailPage from './pages/MedicineDetailPage';
 import './index.css';
 
 function App() {
   return (
     <>
-      <SearchResultPage />
+      <MedicineDetailPage />
     </>
   );
 }
