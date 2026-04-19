@@ -1,10 +1,10 @@
-import SubstituteComparisonPage from './pages/SubstituteComparisonPage';
+import AdminPage from './pages/AdminPage';
 import './index.css';
 
 function App() {
   return (
     <>
-      <SubstituteComparisonPage />
+      <AdminPage />
     </>
   );
 }
