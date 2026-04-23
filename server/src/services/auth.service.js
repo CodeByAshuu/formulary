@@ -1,7 +1,7 @@
 // server/src/services/auth.service.js
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { findUserByEmail, createUser } from '../models/user.model.js';
+import { findUserByEmail, createUser, findUserById } from '../models/user.model.js';
 
 export const loginService = async (email, password) => {
   const result = await findUserByEmail(email);
@@ -44,5 +44,10 @@ export const registerService = async (userData) => {
     password: hashedPassword
   });
 
+  return result.rows[0];
+};
+
+export const findUserByIdService = async (id) => {
+  const result = await findUserById(id);
   return result.rows[0];
 };

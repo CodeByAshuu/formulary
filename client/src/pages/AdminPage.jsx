@@ -22,7 +22,6 @@ function AdminPage() {
       <div className="hero-header" style={{ paddingBottom: '24px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <span className="label-sm" style={{ color: 'var(--primary)' }}>Secure Access</span>
             <h1 className="display-lg hero-header-gradient" style={{ margin: '8px 0' }}>Clinical Admin</h1>
             <p className="body-md" style={{ color: 'var(--on-surface-variant)', maxWidth: '500px' }}>
               Manage master formulary datasets, govern substitute linkages, and monitor system performance. Ensure clinical accuracy before publishing to the live search index.

@@ -32,8 +32,8 @@ const SigninPage = () => {
   return (
     <div className="h-screen bg-surface flex relative font-body text-on-surface overflow-hidden">
       {/* Dynamic Background Elements */}
-      <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-primary-fixed/30 rounded-full mix-blend-multiply filter blur-[150px] opacity-70 animate-pulse" style={{ animationDuration: '7s' }}></div>
-      <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-secondary-fixed/30 rounded-full mix-blend-multiply filter blur-[150px] opacity-70 animate-pulse" style={{ animationDuration: '10s', animationDelay: '1s' }}></div>
+      <div className="absolute top-[-20%] right-[-10%] w-200 h-200 bg-primary-fixed/30 rounded-full mix-blend-multiply filter blur-[150px] opacity-70 animate-pulse" style={{ animationDuration: '7s' }}></div>
+      <div className="absolute bottom-[-20%] left-[-10%] w-150 h150 bg-secondary-fixed/30 rounded-full mix-blend-multiply filter blur-[150px] opacity-70 animate-pulse" style={{ animationDuration: '10s', animationDelay: '1s' }}></div>
 
       {/* Left Column: Visual/Brand */}
       <div className="hidden lg:flex w-1/2 relative flex-col justify-between px-12 py-10 z-10">
@@ -47,9 +47,9 @@ const SigninPage = () => {
         <div className="space-y-6 max-w-lg">
           <h1 className="font-display text-5xl lg:text-6xl font-bold leading-tight tracking-tight">
             Elevating <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Clinical Care</span>
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-secondary">Clinical Care</span>
           </h1>
-          <p className="text-on-surface-variant text-base font-medium leading-relaxed max-w-md">
+          <p className="text-on-surface-variant text-base font-normal leading-relaxed max-w-md">
             Experience the pinnacle of medical orchestration. A digital atelier engineered for elite practitioners seeking absolute precision.
           </p>
           
@@ -61,8 +61,8 @@ const SigninPage = () => {
                 </div>
               ))}
             </div>
-            <div className="text-xs font-bold text-on-surface-variant">
-              Trusted by <span className="text-primary">10,000+</span> professionals
+            <div className="text-xs font-medium text-on-surface-variant">
+              Trusted by <span className="text-primary font-bold">10,000+</span> professionals
             </div>
           </div>
         </div>
@@ -73,22 +73,22 @@ const SigninPage = () => {
 
       {/* Right Column: Auth Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center z-10">
-        <div className="w-full max-w-md bg-surface-container-lowest/80 backdrop-blur-xl border border-white/40 p-6 sm:p-10 rounded-[2rem] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] transition-all duration-500 hover:shadow-[0_30px_60px_-15px_rgba(0,81,63,0.1)] relative group">
+        <div className="w-full max-w-md bg-surface-container-lowest/80 backdrop-blur-xl border border-white/40 p-6 sm:p-10 rounded-4xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] transition-all duration-500 hover:shadow-[0_30px_60px_-15px_rgba(0,81,63,0.1)] relative group">
           
           <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-container flex items-center justify-center shadow-md">
-              <span className="material-symbols-outlined text-white text-lg">clinical_notes</span>
+            <div className="w-8 h-8 rounded-full bg-linear-to-br from-primary to-primary-container flex items-center justify-center shadow-md">
+              <span className="material-symbols-outlined text-white text-lg font-light">clinical_notes</span>
             </div>
-             <span className="font-display font-bold text-lg tracking-widest uppercase text-primary">Formulary</span>
+             <span className="font-display font-medium text-lg tracking-widest uppercase text-primary">Formulary</span>
           </div>
 
           <div className="space-y-1 mb-8 text-center lg:text-left">
-            <h2 className="font-display text-2xl font-bold text-on-surface">Welcome Back</h2>
-            <p className="text-on-surface-variant font-medium text-xs">Enter your clinical credentials to access your workspace.</p>
+            <h2 className="font-display text-2xl font-semibold text-on-surface">Welcome Back</h2>
+            <p className="text-on-surface-variant font-normal text-xs">Enter your clinical credentials to access your workspace.</p>
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-xs font-medium uppercase tracking-wider flex items-center gap-2">
               <span className="material-symbols-outlined text-sm">error</span>
               {error}
             </div>
@@ -96,7 +96,7 @@ const SigninPage = () => {
 
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-1.5 relative group">
-              <label className="text-[0.6rem] uppercase tracking-widest font-bold text-on-surface-variant ml-1" htmlFor="email">Email Address</label>
+              <label className="text-[0.6rem] uppercase tracking-widest font-medium text-on-surface-variant ml-1" htmlFor="email">Email Address</label>
               <div className="relative flex items-center">
                  <span className="material-symbols-outlined absolute left-4 text-outline group-focus-within:text-primary transition-colors text-lg">alternate_email</span>
                  <input 
@@ -113,8 +113,8 @@ const SigninPage = () => {
 
             <div className="space-y-1.5 relative group">
               <div className="flex justify-between items-center ml-1 mb-0.5">
-                <label className="text-[0.6rem] uppercase tracking-widest font-bold text-on-surface-variant" htmlFor="password">Password</label>
-                <Link to="#" className="text-[0.6rem] uppercase tracking-widest font-bold text-primary hover:text-secondary transition-colors">Forgot?</Link>
+                <label className="text-[0.6rem] uppercase tracking-widest font-medium text-on-surface-variant" htmlFor="password">Password</label>
+                <Link to="#" className="text-[0.6rem] uppercase tracking-widest font-medium text-primary hover:text-secondary transition-colors">Forgot?</Link>
               </div>
               <div className="relative flex items-center">
                 <span className="material-symbols-outlined absolute left-4 text-outline group-focus-within:text-primary transition-colors text-lg">lock</span>
@@ -123,7 +123,7 @@ const SigninPage = () => {
                   id="password" 
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-11 py-3.5 bg-surface-container-low border border-transparent rounded-xl focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/10 transition-all duration-300 outline-none text-sm font-medium"
+                  className="w-full pl-11 pr-11 py-3.5 bg-surface-container-low border border-transparent rounded-xl focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/10 transition-all duration-300 outline-none text-sm font-normal"
                   placeholder="••••••••"
                   required
                 />

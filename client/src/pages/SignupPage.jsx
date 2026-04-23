@@ -41,7 +41,7 @@ const SignupPage = () => {
         <div className="absolute bottom-[-20%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-secondary-fixed/20 blur-[120px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }}></div>
       </div>
 
-      <div className="w-full max-w-5xl bg-surface-container-lowest/70 backdrop-blur-2xl rounded-[2rem] shadow-[0_40px_80px_-20px_rgba(11,28,48,0.08)] border border-white/60 relative z-10 flex flex-col md:flex-row transition-all duration-700 hover:shadow-[0_50px_100px_-20px_rgba(11,28,48,0.12)]">
+      <div className="w-full max-w-5xl bg-surface-container-lowest/70 backdrop-blur-2xl rounded-4xl shadow-[0_40px_80px_-20px_rgba(11,28,48,0.08)] border border-white/60 relative z-10 flex flex-col md:flex-row transition-all duration-700 hover:shadow-[0_50px_100px_-20px_rgba(11,28,48,0.12)]">
         
         {/* Left Side: Information / Branding */}
         <div className="w-full md:w-5/12 bg-primary p-8 sm:p-10 text-white flex flex-col justify-between relative overflow-hidden">
@@ -53,12 +53,12 @@ const SignupPage = () => {
               <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/30 transition-colors border border-white/20">
                 <span className="material-symbols-outlined text-white text-lg font-light">clinical_notes</span>
               </div>
-              <span className="font-display font-bold text-lg tracking-widest uppercase text-white/90 ml-1">Formulary</span>
+              <span className="font-display text-lg tracking-widest text-white/90 ml-1">Formulary</span>
             </Link>
 
             <div className="mt-12 space-y-4">
-              <h2 className="font-display text-3xl font-bold leading-tight">Join the Elite Medical Network.</h2>
-              <p className="text-primary-fixed-dim text-base leading-relaxed font-medium">
+              <h2 className="font-display text-3xl font-semibold leading-tight">Join the Elite Medical Network.</h2>
+              <p className="text-primary-fixed-dim text-base leading-relaxed font-normal">
                 Streamline prescriptions, optimize workflows, and deliver unmatched care.
               </p>
             </div>
@@ -89,12 +89,12 @@ const SignupPage = () => {
         {/* Right Side: Form */}
         <div className="w-full md:w-7/12 p-6 sm:p-10 lg:p-12 flex flex-col justify-center">
           <div className="mb-6 text-center sm:text-left">
-            <h3 className="font-display text-2xl font-bold mb-1 text-on-surface">Create Account</h3>
-            <p className="text-on-surface-variant text-[11px] font-medium tracking-wide">Establish your clinical credentials below.</p>
+            <h3 className="font-display text-2xl font-semibold mb-1 text-on-surface">Create Account</h3>
+            <p className="text-on-surface-variant text-[11px] font-normal tracking-wide">Establish your clinical credentials below.</p>
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-xs font-medium uppercase tracking-wider flex items-center gap-2">
               <span className="material-symbols-outlined text-sm">error</span>
               {error}
             </div>
@@ -103,7 +103,7 @@ const SignupPage = () => {
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                <div className="space-y-1.5 relative group">
-                <label className="text-[0.6rem] uppercase tracking-widest font-bold text-on-surface-variant ml-1" htmlFor="firstName">First Name</label>
+                <label className="text-[0.6rem] uppercase tracking-widest font-medium text-on-surface-variant ml-1" htmlFor="firstName">First Name</label>
                 <div className="relative flex items-center">
                   <span className="material-symbols-outlined absolute left-4 text-outline group-focus-within:text-primary transition-colors text-lg font-light">person</span>
                   <input 
@@ -111,14 +111,14 @@ const SignupPage = () => {
                     id="firstName" 
                     value={formData.firstName}
                     onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3.5 bg-surface-container-low border border-transparent rounded-xl focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/10 transition-all duration-300 outline-none text-sm font-medium"
-                    placeholder="Julian"
+                    className="w-full pl-11 pr-4 py-3.5 bg-surface-container-low border border-transparent rounded-xl focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/10 transition-all duration-300 outline-none text-sm font-normal"
+                    placeholder="Samay"
                     required
                   />
                 </div>
               </div>
                <div className="space-y-1.5 relative group">
-                <label className="text-[0.6rem] uppercase tracking-widest font-bold text-on-surface-variant ml-1" htmlFor="lastName">Last Name</label>
+                <label className="text-[0.6rem] uppercase tracking-widest font-medium text-on-surface-variant ml-1" htmlFor="lastName">Last Name</label>
                 <div className="relative flex items-center">
                   <span className="material-symbols-outlined absolute left-4 text-outline group-focus-within:text-primary transition-colors text-lg font-light">person</span>
                   <input 
@@ -126,8 +126,8 @@ const SignupPage = () => {
                     id="lastName" 
                     value={formData.lastName}
                     onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3.5 bg-surface-container-low border border-transparent rounded-xl focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/10 transition-all duration-300 outline-none text-sm font-medium"
-                    placeholder="Vane"
+                    className="w-full pl-11 pr-4 py-3.5 bg-surface-container-low border border-transparent rounded-xl focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/10 transition-all duration-300 outline-none text-sm font-normal"
+                    placeholder="Raina"
                     required
                   />
                 </div>
@@ -135,7 +135,7 @@ const SignupPage = () => {
             </div>
 
             <div className="space-y-1.5 relative group">
-              <label className="text-[0.6rem] uppercase tracking-widest font-bold text-on-surface-variant ml-1" htmlFor="email">Professional Email</label>
+              <label className="text-[0.6rem] uppercase tracking-widest font-medium text-on-surface-variant ml-1" htmlFor="email">Professional Email</label>
               <div className="relative flex items-center">
                 <span className="material-symbols-outlined absolute left-4 text-outline group-focus-within:text-primary transition-colors text-lg font-light">mail</span>
                 <input 
@@ -143,23 +143,23 @@ const SignupPage = () => {
                   id="email" 
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-3.5 bg-surface-container-low border border-transparent rounded-xl focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/10 transition-all duration-300 outline-none text-sm font-medium"
-                  placeholder="dr.vane@hospital.org"
+                  className="w-full pl-11 pr-4 py-3.5 bg-surface-container-low border border-transparent rounded-xl focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/10 transition-all duration-300 outline-none text-sm font-normal"
+                  placeholder="thistooshallpass@habitat.org"
                   required
                 />
               </div>
             </div>
 
             <div className="space-y-1.5 relative group">
-              <label className="text-[0.6rem] uppercase tracking-widest font-bold text-on-surface-variant ml-1" htmlFor="password">Secure Password</label>
+              <label className="text-[0.6rem] uppercase tracking-widest font-medium text-on-surface-variant ml-1" htmlFor="password">Secure Password</label>
               <div className="relative flex items-center">
                 <span className="material-symbols-outlined absolute left-4 text-outline group-focus-within:text-primary transition-colors text-lg font-light">lock</span>
                 <input 
-                  type={showPassword ? "text" : "password"}
+                   type={showPassword ? "text" : "password"}
                   id="password" 
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-11 py-3.5 bg-surface-container-low border border-transparent rounded-xl focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/10 transition-all duration-300 outline-none text-sm font-medium"
+                  className="w-full pl-11 pr-11 py-3.5 bg-surface-container-low border border-transparent rounded-xl focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/10 transition-all duration-300 outline-none text-sm font-normal"
                   placeholder="••••••••••••"
                   required
                 />

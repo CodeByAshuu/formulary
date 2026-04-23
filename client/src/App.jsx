@@ -6,7 +6,9 @@ import SubstituteComparisonPage from './pages/SubstituteComparisonPage';
 import MedicineDetailPage from './pages/MedicineDetailPage';
 import SigninPage from './pages/SigninPage';
 import SignupPage from './pages/SignupPage';
+import ProfilePage from './pages/ProfilePage';
 import Navbar from './components/Navbar';
+import ScrollToTop from './components/ScrollToTop';
 import './index.css';
 
 function App() {
@@ -21,7 +23,9 @@ function App() {
         <Route path="/medicine/:id" element={<MedicineDetailPage />} />
         <Route path="/signin" element={<SigninPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
+      <ScrollToTop />
     </Router>
   );
 }

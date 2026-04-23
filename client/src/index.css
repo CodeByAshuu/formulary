@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Elms+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
 
 @theme {
   --color-outline-variant: #bec9c3;
@@ -25,7 +27,6 @@
   --font-label: "Elms Sans", sans-serif;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Elms+Sans:ital,wght@0,100..900;1,100..900&family=Gowun+Dodum&family=League+Spartan:wght@100..900&display=swap');
 
 :root {
   /* Surface Layers */
@@ -65,6 +66,7 @@
 
 * {
   box-sizing: border-box;
+  font-family: "Elms Sans", sans-serif;
 }
 
 body {
@@ -139,7 +141,7 @@ body {
 }
 .hero-header-gradient {
   background: linear-gradient(135deg, var(--primary), var(--primary-container));
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
 }

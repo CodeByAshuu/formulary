@@ -1,5 +1,5 @@
 // server/src/controllers/auth.controller.js
-import { loginService, registerService } from '../services/auth.service.js';
+import { loginService, registerService, findUserByIdService } from '../services/auth.service.js';
 
 export const login = async (req, res) => {
   try {
@@ -9,7 +9,6 @@ export const login = async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    // Using email as username for now as per frontend request
     const token = await loginService(email, password);
     res.json({ token, message: 'Logged in successfully' });
   } catch (err) {
@@ -29,5 +28,17 @@ export const register = async (req, res) => {
     res.status(201).json({ message: 'User registered successfully', user: result });
   } catch (err) {
     res.status(400).json({ error: err.message });
+  }
+};
+
+export const getMe = async (req, res) => {
+  try {
+    const user = await findUserByIdService(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
