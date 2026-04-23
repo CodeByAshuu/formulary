@@ -1,4 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-outline-variant: #bec9c3;
+  --color-on-surface: #0b1c30;
+  --color-surface-variant: #d3e4fe;
+  --color-on-primary-fixed: #002118;
+  --color-primary: #00513f;
+  --color-primary-container: #006b54;
+  --color-primary-fixed: #9ef3d6;
+  --color-primary-fixed-dim: #82d7ba;
+  --color-secondary: #126c47;
+  --color-secondary-container: #9ff1c3;
+  --color-secondary-fixed: #a2f4c6;
+  --color-tertiary: #294d3e;
+  --color-surface: #f8f9ff;
+  --color-surface-container-low: #eff4ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #dce9ff;
+  --color-outline: #6f7a74;
+  --color-on-surface-variant: #3e4944;
+
+  --font-display: "Elms Sans", sans-serif;
+  --font-body: "Elms Sans", sans-serif;
+  --font-label: "Elms Sans", sans-serif;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Elms+Sans:ital,wght@0,100..900;1,100..900&family=Gowun+Dodum&family=League+Spartan:wght@100..900&display=swap');
 
 :root {
   /* Surface Layers */
@@ -13,6 +40,7 @@
   --primary-fixed: #9ef3d6;
   --primary-fixed-dim: rgba(158, 243, 214, 0.1);
   --primary-ghost-border: rgba(0, 81, 63, 0.2);
+
   
   /* Text & Accents */
   --on-surface: #0b1c30;
@@ -24,8 +52,8 @@
   --tertiary: #294d3e; /* Success / Complete */
 
   /* Typography */
-  --font-display: 'Plus Jakarta Sans', sans-serif;
-  --font-body: 'Manrope', sans-serif;
+  --font-display: "Elms Sans", sans-serif;
+  --font-body: "Elms Sans", sans-serif;
   
   --radius-sm: 0.25rem;
   --radius-md: 0.375rem;
@@ -45,7 +73,14 @@ body {
   color: var(--on-surface);
   font-family: var(--font-body);
   font-size: 0.875rem;
+  font-optical-sizing: auto;
+  font-style: normal;
   -webkit-font-smoothing: antialiased;
+}
+
+.font-elms {
+  font-family: "Elms Sans", sans-serif;
+  font-optical-sizing: auto;
 }
 
 /* Typography Classes */
@@ -90,17 +125,17 @@ body {
 /* Main Layout */
 .dashboard-container {
   min-height: 100vh;
-  padding: 48px 24px;
+  padding: 24px 16px;
   max-width: 1400px;
   margin: 0 auto;
 }
 
 /* Header Area Gradient */
 .hero-header {
-  padding: 24px 0 48px;
+  padding: 12px 0 24px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 .hero-header-gradient {
   background: linear-gradient(135deg, var(--primary), var(--primary-container));
@@ -139,8 +174,8 @@ body {
 .bento-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 24px;
-  margin-top: 24px;
+  gap: 16px;
+  margin-top: 16px;
 }
 
 .clinical-card {
