@@ -1,16 +1,33 @@
-import { loginService } from '../services/auth.service.js';
+// server/src/controllers/auth.controller.js
+import { loginService, registerService } from '../services/auth.service.js';
 
 export const login = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
     
-    if (!username || !password) {
-      return res.status(400).json({ error: 'Username and password are required' });
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    const token = await loginService(username, password);
+    // Using email as username for now as per frontend request
+    const token = await loginService(email, password);
     res.json({ token, message: 'Logged in successfully' });
   } catch (err) {
     res.status(401).json({ error: err.message });
+  }
+};
+
+export const register = async (req, res) => {
+  try {
+    const { firstName, lastName, email, password } = req.body;
+    
+    if (!email || !password || !firstName || !lastName) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    const result = await registerService({ firstName, lastName, email, password });
+    res.status(201).json({ message: 'User registered successfully', user: result });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
   }
 };

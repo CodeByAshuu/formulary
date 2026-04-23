@@ -1,12 +1,40 @@
 // client/src/pages/SignupPage.jsx
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { register } from '../api/auth';
 
 const SignupPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: ''
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      await register(formData);
+      navigate('/signin'); // Redirect to login after successful signup
+    } catch (err) {
+      setError(err.response?.data?.error || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-surface flex items-center justify-center relative font-body text-on-surface selection:bg-primary-fixed">
+    <div className="min-h-screen bg-surface flex items-center justify-center p-4 sm:p-6 relative font-body text-on-surface selection:bg-primary-fixed">
       {/* Animated Mesh Gradient Background */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute top-[-30%] left-[-10%] w-[70vw] h-[70vw] rounded-full bg-primary-fixed/20 blur-[100px] animate-pulse" style={{ animationDuration: '8s' }}></div>
@@ -25,7 +53,7 @@ const SignupPage = () => {
               <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/30 transition-colors border border-white/20">
                 <span className="material-symbols-outlined text-white text-lg font-light">clinical_notes</span>
               </div>
-              <span className="font-display font-bold text-lg tracking-widest uppercase text-white/90">Formulary</span>
+              <span className="font-display font-bold text-lg tracking-widest uppercase text-white/90 ml-1">Formulary</span>
             </Link>
 
             <div className="mt-12 space-y-4">
@@ -65,7 +93,14 @@ const SignupPage = () => {
             <p className="text-on-surface-variant text-[11px] font-medium tracking-wide">Establish your clinical credentials below.</p>
           </div>
 
-          <form className="space-y-4">
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+              <span className="material-symbols-outlined text-sm">error</span>
+              {error}
+            </div>
+          )}
+
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                <div className="space-y-1.5 relative group">
                 <label className="text-[0.6rem] uppercase tracking-widest font-bold text-on-surface-variant ml-1" htmlFor="firstName">First Name</label>
@@ -74,8 +109,11 @@ const SignupPage = () => {
                   <input 
                     type="text" 
                     id="firstName" 
+                    value={formData.firstName}
+                    onChange={handleChange}
                     className="w-full pl-11 pr-4 py-3.5 bg-surface-container-low border border-transparent rounded-xl focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/10 transition-all duration-300 outline-none text-sm font-medium"
                     placeholder="Julian"
+                    required
                   />
                 </div>
               </div>
@@ -86,22 +124,28 @@ const SignupPage = () => {
                   <input 
                     type="text" 
                     id="lastName" 
+                    value={formData.lastName}
+                    onChange={handleChange}
                     className="w-full pl-11 pr-4 py-3.5 bg-surface-container-low border border-transparent rounded-xl focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/10 transition-all duration-300 outline-none text-sm font-medium"
                     placeholder="Vane"
+                    required
                   />
                 </div>
               </div>
             </div>
 
             <div className="space-y-1.5 relative group">
-              <label className="text-[0.6rem] uppercase tracking-widest font-bold text-on-surface-variant ml-1" htmlFor="email">Email</label>
+              <label className="text-[0.6rem] uppercase tracking-widest font-bold text-on-surface-variant ml-1" htmlFor="email">Professional Email</label>
               <div className="relative flex items-center">
                 <span className="material-symbols-outlined absolute left-4 text-outline group-focus-within:text-primary transition-colors text-lg font-light">mail</span>
                 <input 
                   type="email" 
                   id="email" 
+                  value={formData.email}
+                  onChange={handleChange}
                   className="w-full pl-11 pr-4 py-3.5 bg-surface-container-low border border-transparent rounded-xl focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/10 transition-all duration-300 outline-none text-sm font-medium"
                   placeholder="dr.vane@hospital.org"
+                  required
                 />
               </div>
             </div>
@@ -111,10 +155,13 @@ const SignupPage = () => {
               <div className="relative flex items-center">
                 <span className="material-symbols-outlined absolute left-4 text-outline group-focus-within:text-primary transition-colors text-lg font-light">lock</span>
                 <input 
-                   type={showPassword ? "text" : "password"}
+                  type={showPassword ? "text" : "password"}
                   id="password" 
+                  value={formData.password}
+                  onChange={handleChange}
                   className="w-full pl-11 pr-11 py-3.5 bg-surface-container-low border border-transparent rounded-xl focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/10 transition-all duration-300 outline-none text-sm font-medium"
                   placeholder="••••••••••••"
+                  required
                 />
                 <button 
                   type="button"
@@ -130,7 +177,7 @@ const SignupPage = () => {
 
              <div className="flex items-start gap-3 mt-2">
               <div className="flex items-center h-5">
-                 <input id="terms" type="checkbox" className="w-4 h-4 border border-outline-variant rounded bg-surface-container-low text-primary focus:ring-primary focus:ring-2 transition-all cursor-pointer accent-primary" />
+                 <input id="terms" type="checkbox" required className="w-4 h-4 border border-outline-variant rounded bg-surface-container-low text-primary focus:ring-primary focus:ring-2 transition-all cursor-pointer accent-primary" />
               </div>
               <label htmlFor="terms" className="text-[10px] text-on-surface-variant font-medium leading-normal cursor-pointer">
                 I agree to the <Link to="#" className="text-primary font-bold hover:underline">Terms</Link> and <Link to="#" className="text-primary font-bold hover:underline">Privacy Policy</Link>.
@@ -140,9 +187,14 @@ const SignupPage = () => {
             <div className="pt-2">
                <button 
                 type="submit" 
-                className="w-full py-3.5 bg-primary text-white rounded-xl font-bold tracking-wide flex items-center justify-center gap-2 overflow-hidden shadow-[0_10px_20px_-10px_rgba(0,81,63,0.4)] hover:shadow-[0_15px_25px_-10px_rgba(0,81,63,0.5)] hover:bg-primary-container transition-all hover:-translate-y-0.5 active:translate-y-0 text-sm"
+                disabled={loading}
+                className="w-full py-3.5 bg-primary text-white rounded-xl font-bold tracking-wide flex items-center justify-center gap-2 overflow-hidden shadow-[0_10px_20px_-10px_rgba(0,81,63,0.4)] hover:shadow-[0_15px_25px_-10px_rgba(0,81,63,0.5)] hover:bg-primary-container transition-all hover:-translate-y-0.5 active:translate-y-0 text-sm disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                Create Account
+                {loading ? (
+                  <span className="animate-pulse">Creating Account...</span>
+                ) : (
+                  'Create Account'
+                )}
               </button>
             </div>
           </form>

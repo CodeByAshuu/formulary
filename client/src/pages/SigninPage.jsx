@@ -1,9 +1,33 @@
 // client/src/pages/SigninPage.jsx
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { login } from '../api/auth';
 
 const SigninPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      const data = await login(formData.email, formData.password);
+      localStorage.setItem('token', data.token);
+      navigate('/'); // Redirect to home/dashboard
+    } catch (err) {
+      setError(err.response?.data?.error || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="h-screen bg-surface flex relative font-body text-on-surface overflow-hidden">
@@ -17,7 +41,7 @@ const SigninPage = () => {
           <div className="w-10 h-10 rounded-full bg-linear-to-br from-primary to-primary-container flex items-center justify-center shadow-lg">
             <span className="material-symbols-outlined text-white text-xl">clinical_notes</span>
           </div>
-          <span className="font-display  text-xl tracking-widest text-primary">Formulary</span>
+          <span className="font-display text-xl tracking-widest text-primary ml-3">Formulary</span>
         </div>
 
         <div className="space-y-6 max-w-lg">
@@ -44,17 +68,13 @@ const SigninPage = () => {
         </div>
 
         <div className="text-[10px] font-bold uppercase tracking-widest text-outline/60">
-          {/* © {new Date().getFullYear()} Formulary Systems. */}
         </div>
       </div>
 
       {/* Right Column: Auth Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center z-10">
-        <div 
-          className="w-full max-w-md bg-surface-container-lowest/80 backdrop-blur-xl border border-white/40 p-6 sm:p-10 rounded-[2rem] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] transition-all duration-500 hover:shadow-[0_30px_60px_-15px_rgba(0,81,63,0.1)] relative group"
-          // onMouseEnter={() => setIsHovered(true)}
-          // onMouseLeave={() => setIsHovered(false)}
-        >
+        <div className="w-full max-w-md bg-surface-container-lowest/80 backdrop-blur-xl border border-white/40 p-6 sm:p-10 rounded-[2rem] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] transition-all duration-500 hover:shadow-[0_30px_60px_-15px_rgba(0,81,63,0.1)] relative group">
+          
           <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-container flex items-center justify-center shadow-md">
               <span className="material-symbols-outlined text-white text-lg">clinical_notes</span>
@@ -67,7 +87,14 @@ const SigninPage = () => {
             <p className="text-on-surface-variant font-medium text-xs">Enter your clinical credentials to access your workspace.</p>
           </div>
 
-          <form className="space-y-4">
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+              <span className="material-symbols-outlined text-sm">error</span>
+              {error}
+            </div>
+          )}
+
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-1.5 relative group">
               <label className="text-[0.6rem] uppercase tracking-widest font-bold text-on-surface-variant ml-1" htmlFor="email">Email Address</label>
               <div className="relative flex items-center">
@@ -75,8 +102,11 @@ const SigninPage = () => {
                  <input 
                   type="email" 
                   id="email" 
+                  value={formData.email}
+                  onChange={handleChange}
                   className="w-full pl-11 pr-4 py-3.5 bg-surface-container-low border border-transparent rounded-xl focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/10 transition-all duration-300 outline-none text-sm font-medium"
                   placeholder="doctor@clinic.com"
+                  required
                 />
               </div>
             </div>
@@ -91,8 +121,11 @@ const SigninPage = () => {
                 <input 
                   type={showPassword ? "text" : "password"}
                   id="password" 
+                  value={formData.password}
+                  onChange={handleChange}
                   className="w-full pl-11 pr-11 py-3.5 bg-surface-container-low border border-transparent rounded-xl focus:bg-white focus:border-primary/30 focus:ring-4 focus:ring-primary/10 transition-all duration-300 outline-none text-sm font-medium"
                   placeholder="••••••••"
+                  required
                 />
                 <button 
                   type="button"
@@ -109,10 +142,17 @@ const SigninPage = () => {
             <div className="pt-2">
               <button 
                 type="submit" 
-                className="w-full py-3.5 bg-primary text-white rounded-xl font-bold tracking-wide flex items-center justify-center gap-2 overflow-hidden group shadow-[0_10px_20px_-10px_rgba(0,81,63,0.5)] hover:shadow-[0_15px_25px_-10px_rgba(0,81,63,0.6)] hover:bg-primary-container transition-all hover:-translate-y-0.5 active:translate-y-0 text-sm"
+                disabled={loading}
+                className="w-full py-3.5 bg-primary text-white rounded-xl font-bold tracking-wide flex items-center justify-center gap-2 overflow-hidden group shadow-[0_10px_20px_-10px_rgba(0,81,63,0.5)] hover:shadow-[0_15px_25px_-10px_rgba(0,81,63,0.6)] hover:bg-primary-container transition-all hover:-translate-y-0.5 active:translate-y-0 text-sm disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                <span>Access Workspace</span>
-                <span className="material-symbols-outlined text-sm transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
+                {loading ? (
+                  <span className="animate-pulse">Authenticating...</span>
+                ) : (
+                  <>
+                    <span>Access Workspace</span>
+                    <span className="material-symbols-outlined text-sm transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
+                  </>
+                )}
               </button>
             </div>
           </form>
