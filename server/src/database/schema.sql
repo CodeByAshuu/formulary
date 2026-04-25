@@ -3,11 +3,15 @@ DROP TABLE IF EXISTS substitutes CASCADE;
 DROP TABLE IF EXISTS medicines CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 
--- Create Users table (for admin use cases)
+-- Create Users table
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
-  username VARCHAR(50) UNIQUE NOT NULL,
-  password VARCHAR(255) NOT NULL
+  first_name VARCHAR(100),
+  last_name VARCHAR(100),
+  username VARCHAR(100) UNIQUE NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create Medicines table
