@@ -17,7 +17,7 @@ export const loginService = async (email, password) => {
   }
 
   const token = jwt.sign(
-    { id: user.id, email: user.email },
+    { id: user.id, email: user.email, role: user.role },
     process.env.JWT_SECRET,
     { expiresIn: '1d' }
   );
@@ -44,7 +44,14 @@ export const registerService = async (userData) => {
     password: hashedPassword
   });
 
-  return result.rows[0];
+  const user = result.rows[0];
+  const token = jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: '1d' }
+  );
+
+  return { user, token };
 };
 
 export const findUserByIdService = async (id) => {

@@ -1,7 +1,8 @@
-// client/src/pages/SigninPage.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { login } from '../api/auth';
+import { login as loginApi } from '../api/auth';
+import { useAuth } from '../context/AuthContext';
+import { jwtDecode } from 'jwt-decode';
 
 const SigninPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -9,6 +10,7 @@ const SigninPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -19,9 +21,15 @@ const SigninPage = () => {
     setLoading(true);
     setError('');
     try {
-      const data = await login(formData.email, formData.password);
-      localStorage.setItem('token', data.token);
-      navigate('/'); // Redirect to home/dashboard
+      const data = await loginApi(formData.email, formData.password);
+      const decodedUser = jwtDecode(data.token);
+      login(data.token, decodedUser);
+      
+      if (decodedUser.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed. Please try again.');
     } finally {

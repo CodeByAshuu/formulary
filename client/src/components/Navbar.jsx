@@ -1,18 +1,16 @@
 // client/src/components/Navbar.jsx
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
   const location = useLocation();
-
-  // Hide Navbar on Signin and Signup pages if desired, 
-  // but usually users want it everywhere or have a special one.
-  // The user says "Fix the navbar", which implies it should look good.
+  const { user, isAdmin, logout } = useAuth();
   
   const navLinks = [
     { name: 'Search', path: '/' },
-    { name: 'Dashboard', path: '/admin' },
-    { name: 'Profile', path: '/profile' },
+    ...(isAdmin ? [{ name: 'Dashboard', path: '/admin' }] : []),
+    ...(user ? [{ name: 'Profile', path: '/profile' }] : []),
   ];
 
   return (
@@ -44,18 +42,34 @@ const Navbar = () => {
       </div>
 
       <div className="flex items-center gap-6">
-        <Link 
-          to="/signin" 
-          className="text-xs font-medium uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors"
-        >
-          Sign In
-        </Link>
-        <Link 
-          to="/signup" 
-          className="bg-primary text-white text-xs font-semibold uppercase tracking-widest px-6 py-2.5 rounded-full shadow-[0_8px_16px_-4px_rgba(0,81,63,0.3)] hover:bg-primary-container hover:shadow-[0_12px_24px_-4px_rgba(0,81,63,0.4)] transition-all active:scale-95"
-        >
-          Create Account
-        </Link>
+        {!user ? (
+          <>
+            <Link 
+              to="/signin" 
+              className="text-xs font-medium uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors"
+            >
+              Sign In
+            </Link>
+            <Link 
+              to="/signup" 
+              className="bg-primary text-white text-xs font-semibold uppercase tracking-widest px-6 py-2.5 rounded-full shadow-[0_8px_16px_-4px_rgba(0,81,63,0.3)] hover:bg-primary-container hover:shadow-[0_12px_24px_-4px_rgba(0,81,63,0.4)] transition-all active:scale-95"
+            >
+              Create Account
+            </Link>
+          </>
+        ) : (
+          <div className="flex items-center gap-4">
+            <span className="text-[10px] uppercase tracking-widest font-bold text-outline">
+              {user.role === 'admin' ? 'Administrator' : 'Practitioner'}
+            </span>
+            <button 
+              onClick={logout}
+              className="text-xs font-medium uppercase tracking-widest text-on-surface-variant hover:text-red-500 transition-colors"
+            >
+              Log Out
+            </button>
+          </div>
+        )}
       </div>
     </nav>
   );

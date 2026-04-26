@@ -1,7 +1,8 @@
-// client/src/pages/SignupPage.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { register } from '../api/auth';
+import { register as registerApi } from '../api/auth';
+import { useAuth } from '../context/AuthContext';
+import { jwtDecode } from 'jwt-decode';
 
 const SignupPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,6 +15,7 @@ const SignupPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -24,8 +26,10 @@ const SignupPage = () => {
     setLoading(true);
     setError('');
     try {
-      await register(formData);
-      navigate('/signin'); // Redirect to login after successful signup
+      const data = await registerApi(formData);
+      const decodedUser = jwtDecode(data.token);
+      login(data.token, decodedUser);
+      navigate('/'); 
     } catch (err) {
       setError(err.response?.data?.error || 'Registration failed. Please try again.');
     } finally {

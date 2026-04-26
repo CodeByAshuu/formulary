@@ -24,8 +24,8 @@ export const register = async (req, res) => {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-    const result = await registerService({ firstName, lastName, email, password });
-    res.status(201).json({ message: 'User registered successfully', user: result });
+    const { user, token } = await registerService({ firstName, lastName, email, password });
+    res.status(201).json({ message: 'User registered successfully', user, token });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
