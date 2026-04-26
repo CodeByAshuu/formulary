@@ -1,6 +1,7 @@
 import { 
   searchMedicineService, 
   getSubstitutesService, 
+  getMedicineByIdService,
   addMedicineService, 
   updateMedicineService, 
   deleteMedicineService 
@@ -10,6 +11,19 @@ export const searchMedicine = async (req, res) => {
   try {
     const name = req.query.name;
     const data = await searchMedicineService(name);
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getMedicineDetails = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const data = await getMedicineByIdService(id);
+    if (!data) {
+      return res.status(404).json({ error: 'Medicine not found' });
+    }
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });

@@ -22,7 +22,7 @@ function App() {
         <Routes>
           <Route path="/" element={<SearchPage />} />
           <Route path="/search-results" element={<SearchResultPage />} />
-          <Route path="/substitute" element={<SubstituteComparisonPage />} />
+          <Route path="/substitutes/:id" element={<SubstituteComparisonPage />} />
           <Route path="/medicine/:id" element={<MedicineDetailPage />} />
           <Route path="/signin" element={<SigninPage />} />
           <Route path="/signup" element={<SignupPage />} />

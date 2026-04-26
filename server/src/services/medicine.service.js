@@ -32,6 +32,26 @@ export const searchMedicineService = async (name) => {
   return data;
 };
 
+export const getMedicineByIdService = async (id) => {
+  const cacheKey = `medicine:${id}`;
+
+  if (redisClient.isReady) {
+    const cached = await redisClient.get(cacheKey);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+  }
+
+  const result = await getMedicineById(id);
+  const data = result.rows[0];
+
+  if (redisClient.isReady && data) {
+    await redisClient.setEx(cacheKey, 3600, JSON.stringify(data));
+  }
+
+  return data;
+};
+
 export const getSubstitutesService = async (id) => {
   const cacheKey = `substitutes:${id}`;
 

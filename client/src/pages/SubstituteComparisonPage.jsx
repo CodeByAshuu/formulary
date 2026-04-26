@@ -1,57 +1,61 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { getMedicineDetails, getMedicineSubstitutes } from '../api/medicine';
 import '../index.css';
 
 function SubstituteComparisonPage() {
-  const referenceMedicine = {
-    name: 'Paramin 500mg',
-    price: '$5.50',
-    manufacturer: 'Atelier Pharma',
-    form: 'Tablet',
-    activeIngredients: 'Paracetamol 500mg',
-  };
+  const { id } = useParams();
+  const [referenceMedicine, setReferenceMedicine] = useState(null);
+  const [substitutes, setSubstitutes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  const substitutes = [
-    {
-      id: 1,
-      name: 'Crocin 500',
-      price: '$2.00',
-      manufacturer: 'GSK',
-      form: 'Tablet',
-      activeIngredients: 'Paracetamol 500mg',
-      matchScore: '100%',
-      savings: '63%',
-      isRecommended: true
-    },
-    {
-      id: 2,
-      name: 'Dolo 500',
-      price: '$2.50',
-      manufacturer: 'Micro Labs',
-      form: 'Tablet',
-      activeIngredients: 'Paracetamol 500mg',
-      matchScore: '100%',
-      savings: '54%',
-      isRecommended: false
-    },
-    {
-      id: 3,
-      name: 'Panadol',
-      price: '$3.00',
-      manufacturer: 'Haleon',
-      form: 'Caplet',
-      activeIngredients: 'Paracetamol 500mg',
-      matchScore: '98%',
-      savings: '45%',
-      isRecommended: false
-    }
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [refData, subData] = await Promise.all([
+          getMedicineDetails(id),
+          getMedicineSubstitutes(id)
+        ]);
+        setReferenceMedicine(refData);
+        
+        // Sort substitutes by price to easily find the cheapest
+        const sortedSubs = [...subData].sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+        setSubstitutes(sortedSubs);
+      } catch (err) {
+        console.error('Failed to fetch comparison data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <div className="animate-spin" style={{ width: '48px', height: '48px', border: '5px solid var(--primary)', borderTopColor: 'transparent', borderRadius: '50%' }}></div>
+      </div>
+    );
+  }
+
+  if (!referenceMedicine) {
+    return (
+      <div className="min-h-screen bg-surface flex flex-col items-center justify-center gap-4">
+        <h2 className="title-md">Pharmacological reference not found</h2>
+        <button onClick={() => navigate(-1)} className="btn-primary">Go Back</button>
+      </div>
+    );
+  }
+
+  const cheapestPrice = substitutes.length > 0 ? parseFloat(substitutes[0].price) : null;
 
   return (
     <div className="dashboard-container">
       {/* Header */}
       <div className="hero-header" style={{ paddingBottom: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-          <span className="label-sm" style={{ cursor: 'pointer' }}>&larr; Back to Detail</span>
+          <button onClick={() => navigate(-1)} className="label-sm" style={{ cursor: 'pointer', background: 'transparent', border: 'none', color: 'inherit' }}>&larr; Back to Detail</button>
         </div>
         
         <div>
@@ -75,68 +79,83 @@ function SubstituteComparisonPage() {
              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                <div>
                  <div className="label-sm">Active Ingredients</div>
-                 <div className="body-md" style={{ color: 'var(--on-surface)', fontWeight: 600 }}>{referenceMedicine.activeIngredients}</div>
+                 <div className="body-md" style={{ color: 'var(--on-surface)', fontWeight: 600 }}>{referenceMedicine.composition}</div>
                </div>
                <div>
                  <div className="label-sm">Manufacturer</div>
                  <div className="body-md" style={{ color: 'var(--on-surface)' }}>{referenceMedicine.manufacturer}</div>
                </div>
                <div>
-                 <div className="label-sm">Form Factor</div>
-                 <div className="body-md" style={{ color: 'var(--on-surface)' }}>{referenceMedicine.form}</div>
+                 <div className="label-sm">Pharmacological Status</div>
+                 <div className="body-md" style={{ color: 'var(--on-surface)' }}>Verified Molecule</div>
                </div>
                <div style={{ marginTop: '16px', borderTop: '1px solid var(--outline-variant)', paddingTop: '16px' }}>
-                 <div className="label-sm">Current Cost</div>
-                 <h2 className="headline-sm" style={{ margin: 0, color: 'var(--on-surface)' }}>{referenceMedicine.price}</h2>
+                 <div className="label-sm">Standard Cost</div>
+                 <h2 className="headline-sm" style={{ margin: 0, color: 'var(--on-surface)' }}>${referenceMedicine.price}</h2>
                </div>
              </div>
           </div>
 
           {/* Comparison Cards Area (Right Side) */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px' }}>
-             {substitutes.map(sub => (
-                <div key={sub.id} className="clinical-card" style={{ position: 'relative' }}>
-                  
-                  {sub.isRecommended && (
-                    <span className="chip chip-success" style={{ position: 'absolute', top: '-12px', left: '24px', boxShadow: 'var(--shadow-ambient)' }}>
-                      Top Recommendation
-                    </span>
-                  )}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '24px' }}>
+             {substitutes.length === 0 ? (
+               <div className="clinical-card" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '60px' }}>
+                  <h3 className="title-md">No substitutes found</h3>
+                  <p className="body-md">No molecular matches are currently in the clinical repository for this compound.</p>
+               </div>
+             ) : (
+               substitutes.map((sub, idx) => {
+                 const isCheapest = parseFloat(sub.price) === cheapestPrice;
+                 const savings = Math.round(((parseFloat(referenceMedicine.price) - parseFloat(sub.price)) / parseFloat(referenceMedicine.price)) * 100);
 
-                  <div style={{ marginTop: sub.isRecommended ? '12px' : '0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-                    <h3 className="title-md" style={{ margin: 0 }}>{sub.name}</h3>
-                    <span className="label-sm" style={{ color: 'var(--tertiary)', fontWeight: 700 }}>{sub.matchScore} Match</span>
-                  </div>
+                 return (
+                   <div key={sub.id} className="clinical-card" style={{ position: 'relative', border: isCheapest ? '2px solid var(--primary)' : '1px solid var(--outline-variant)' }}>
+                     
+                     {isCheapest && (
+                       <span className="chip chip-success" style={{ position: 'absolute', top: '-12px', left: '24px', boxShadow: 'var(--shadow-ambient)', background: 'var(--primary)', color: 'white' }}>
+                         Best Price Strategy
+                       </span>
+                     )}
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
-                     <div>
-                       <div className="label-sm">Manufacturer</div>
-                       <div className="body-md" style={{ color: 'var(--on-surface)' }}>{sub.manufacturer}</div>
+                     <div style={{ marginTop: isCheapest ? '12px' : '0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                       <h3 className="title-md" style={{ margin: 0 }}>{sub.name}</h3>
+                       <span className="label-sm" style={{ color: 'var(--primary)', fontWeight: 700 }}>100% Match</span>
                      </div>
-                     <div>
-                       <div className="label-sm">Form Factor</div>
-                       <div className="body-md" style={{ color: 'var(--on-surface)' }}>{sub.form}</div>
+
+                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
+                        <div>
+                          <div className="label-sm">Manufacturer</div>
+                          <div className="body-md" style={{ color: 'var(--on-surface)' }}>{sub.manufacturer}</div>
+                        </div>
+                        <div>
+                          <div className="label-sm">Molecule Index</div>
+                          <div className="body-md" style={{ color: 'var(--on-surface)' }}>Pharmacological Equivalent</div>
+                        </div>
+                        
+                        <div style={{ marginTop: 'auto', backgroundColor: isCheapest ? 'var(--primary-fixed-dim)' : 'var(--surface-container-low)', padding: '16px', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                           <div>
+                             <div className="label-sm">Retail Cost</div>
+                             <h2 className="title-md" style={{ margin: 0, color: 'var(--on-surface)' }}>${sub.price}</h2>
+                           </div>
+                           <div style={{ textAlign: 'right' }}>
+                             <span className="chip chip-action" style={{ background: isCheapest ? 'var(--primary)' : 'var(--primary-fixed-dim)', color: isCheapest ? 'white' : 'var(--primary)', fontWeight: 700 }}>
+                               Save {savings}%
+                             </span>
+                           </div>
+                        </div>
                      </div>
                      
-                     <div style={{ marginTop: 'auto', backgroundColor: 'var(--surface)', padding: '16px', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div>
-                          <div className="label-sm">Cost</div>
-                          <h2 className="title-md" style={{ margin: 0, color: 'var(--on-surface)' }}>{sub.price}</h2>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <span className="chip chip-action" style={{ background: 'var(--primary-fixed-dim)', color: 'var(--primary)', fontWeight: 700 }}>
-                            Save {sub.savings}
-                          </span>
-                        </div>
-                     </div>
-                  </div>
-                  
-                  <button className="btn-primary" style={{ width: '100%', marginTop: '16px', background: sub.isRecommended ? 'linear-gradient(135deg, var(--primary), var(--primary-container))' : 'var(--surface-container-high)', color: sub.isRecommended ? 'white' : 'var(--primary)', border: 'none', boxShadow: sub.isRecommended ? 'var(--shadow-ambient)' : 'none' }}>
-                    Select Substitute
-                  </button>
+                     <button 
+                        onClick={() => navigate(`/medicine/${sub.id}`)}
+                        className="btn-primary" 
+                        style={{ width: '100%', marginTop: '16px', background: isCheapest ? 'linear-gradient(135deg, var(--primary), var(--primary-container))' : 'var(--surface-container-high)', color: isCheapest ? 'white' : 'var(--primary)', border: 'none', boxShadow: isCheapest ? 'var(--shadow-ambient)' : 'none' }}>
+                       View Clinical Profile
+                     </button>
 
-                </div>
-             ))}
+                   </div>
+                 );
+               })
+             )}
           </div>
 
         </div>

@@ -1,6 +1,7 @@
 import express from "express";
 import { 
   searchMedicine, 
+  getMedicineDetails,
   getSubstitutes, 
   createMedicine, 
   updateMedicine, 
@@ -12,6 +13,7 @@ const router = express.Router();
 
 // Public Routes
 router.get("/search", searchMedicine);
+router.get("/:id", getMedicineDetails);
 router.get("/:id/substitutes", getSubstitutes);
 
 // Protected Admin Routes
