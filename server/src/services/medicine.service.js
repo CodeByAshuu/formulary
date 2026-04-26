@@ -1,3 +1,4 @@
+import { parse } from 'csv-parse/sync';
 import { redisClient } from '../config/redis.js';
 import { 
   findMedicineByName, 
@@ -5,7 +6,9 @@ import {
   getMedicineById, 
   createMedicine, 
   updateMedicine, 
-  deleteMedicine 
+  deleteMedicine,
+  findMedicinesByComposition,
+  addSubstitute
 } from '../models/medicine.model.js';
 
 export const searchMedicineService = async (name) => {
@@ -72,9 +75,67 @@ export const getSubstitutesService = async (id) => {
   return data;
 };
 
+export const smartLinkMedicine = async (medicineId, composition) => {
+  const matches = await findMedicinesByComposition(composition, medicineId);
+  for (const match of matches.rows) {
+    await addSubstitute(medicineId, match.id);
+  }
+};
+
+export const bulkUploadService = async (csvData) => {
+  const records = parse(csvData, {
+    columns: true,
+    skip_empty_lines: true,
+    trim: true
+  });
+
+  const summary = {
+    total: records.length,
+    inserted: 0,
+    failed: 0,
+    errors: []
+  };
+
+  for (const record of records) {
+    try {
+      const { name, composition, manufacturer, price } = record;
+      
+      // Validation
+      if (!name || !composition || !manufacturer || !price) {
+        throw new Error('Missing fields');
+      }
+
+      const result = await createMedicine({
+        name,
+        composition,
+        manufacturer,
+        price: parseFloat(price)
+      });
+
+      const medicine = result.rows[0];
+      
+      // Smart Linking
+      await smartLinkMedicine(medicine.id, medicine.composition);
+      
+      summary.inserted++;
+    } catch (err) {
+      summary.failed++;
+      summary.errors.push({ record: record.name || 'Unknown', error: err.message });
+    }
+  }
+
+  if (redisClient.isReady) {
+    await redisClient.flushDb();
+  }
+
+  return summary;
+};
+
 export const addMedicineService = async (medicineData) => {
   const result = await createMedicine(medicineData);
-  return result.rows[0];
+  const medicine = result.rows[0];
+  await smartLinkMedicine(medicine.id, medicine.composition);
+  return medicine;
 };
 
 export const updateMedicineService = async (id, medicineData) => {
@@ -84,12 +145,16 @@ export const updateMedicineService = async (id, medicineData) => {
   }
 
   const result = await updateMedicine(id, medicineData);
+  const updated = result.rows[0];
   
+  // Re-run smart linking in case composition changed
+  await smartLinkMedicine(id, updated.composition);
+
   if (redisClient.isReady) {
-    await redisClient.flushDb(); // Simple approach to cache invalidation
+    await redisClient.flushDb();
   }
 
-  return result.rows[0];
+  return updated;
 };
 
 export const deleteMedicineService = async (id) => {

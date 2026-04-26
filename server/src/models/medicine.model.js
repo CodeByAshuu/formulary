@@ -12,8 +12,11 @@ export const findSubstitutes = (id) => {
     `
     SELECT m.*
     FROM substitutes s
-    JOIN medicines m ON s.substitute_id = m.id
-    WHERE s.medicine_id = $1
+    JOIN medicines m ON (
+      (s.medicine_id = $1 AND s.substitute_id = m.id) OR 
+      (s.substitute_id = $1 AND s.medicine_id = m.id)
+    )
+    WHERE s.medicine_id = $1 OR s.substitute_id = $1
     `,
     [id]
   );
@@ -23,10 +26,17 @@ export const getMedicineById = (id) => {
   return pool.query("SELECT * FROM medicines WHERE id = $1", [id]);
 };
 
+export const findMedicinesByComposition = (composition, excludeId) => {
+  return pool.query(
+    "SELECT * FROM medicines WHERE composition = $1 AND id != $2",
+    [composition, excludeId]
+  );
+};
+
 export const createMedicine = (medicine) => {
   const { name, composition, manufacturer, price } = medicine;
   return pool.query(
-    "INSERT INTO medicines (name, composition, manufacturer, price) VALUES ($1, $2, $3, $4) RETURNING *",
+    "INSERT INTO medicines (name, composition, manufacturer, price) VALUES ($1, $2, $3, $4) ON CONFLICT (name) DO UPDATE SET composition = EXCLUDED.composition, manufacturer = EXCLUDED.manufacturer, price = EXCLUDED.price RETURNING *",
     [name, composition, manufacturer, price]
   );
 };
@@ -43,9 +53,10 @@ export const deleteMedicine = (id) => {
   return pool.query("DELETE FROM medicines WHERE id = $1 RETURNING *", [id]);
 };
 
-export const addSubstitute = (medicineId, substituteId) => {
+export const addSubstitute = (id1, id2) => {
+  const [minId, maxId] = [Math.min(id1, id2), Math.max(id1, id2)];
   return pool.query(
-    "INSERT INTO substitutes (medicine_id, substitute_id) VALUES ($1, $2), ($2, $1) ON CONFLICT DO NOTHING",
-    [medicineId, substituteId]
+    "INSERT INTO substitutes (medicine_id, substitute_id) VALUES ($1, $2) ON CONFLICT (medicine_id, substitute_id) DO NOTHING",
+    [minId, maxId]
   );
 };

@@ -4,7 +4,8 @@ import {
   getMedicineByIdService,
   addMedicineService, 
   updateMedicineService, 
-  deleteMedicineService 
+  deleteMedicineService,
+  bulkUploadService 
 } from '../services/medicine.service.js';
 
 export const searchMedicine = async (req, res) => {
@@ -25,6 +26,19 @@ export const getMedicineDetails = async (req, res) => {
       return res.status(404).json({ error: 'Medicine not found' });
     }
     res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const bulkUpload = async (req, res) => {
+  try {
+    const { csvData } = req.body;
+    if (!csvData) {
+      return res.status(400).json({ error: 'CSV data is required' });
+    }
+    const summary = await bulkUploadService(csvData);
+    res.json(summary);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
