@@ -15,3 +15,8 @@ export const getProfile = async () => {
   const response = await axios.get('/auth/me');
   return response.data;
 };
+
+export const updateProfile = async (userData) => {
+  const response = await axios.put('/auth/profile', userData);
+  return response.data;
+};

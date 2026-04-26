@@ -1,5 +1,4 @@
-// server/src/controllers/auth.controller.js
-import { loginService, registerService, findUserByIdService } from '../services/auth.service.js';
+import { loginService, registerService, findUserByIdService, updateUserProfile } from '../services/auth.service.js';
 
 export const login = async (req, res) => {
   try {
@@ -38,6 +37,20 @@ export const getMe = async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
     res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const updateProfile = async (req, res) => {
+  try {
+    const { firstName, lastName } = req.body;
+    if (!firstName || !lastName) {
+      return res.status(400).json({ error: 'First name and last name are required' });
+    }
+
+    const updatedUser = await updateUserProfile(req.user.id, { firstName, lastName });
+    res.json({ message: 'Profile updated successfully', user: updatedUser });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

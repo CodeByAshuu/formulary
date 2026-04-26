@@ -1,7 +1,7 @@
 // server/src/services/auth.service.js
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { findUserByEmail, createUser, findUserById } from '../models/user.model.js';
+import { findUserByEmail, createUser, findUserById, updateUser } from '../models/user.model.js';
 
 export const loginService = async (email, password) => {
   const result = await findUserByEmail(email);
@@ -56,5 +56,13 @@ export const registerService = async (userData) => {
 
 export const findUserByIdService = async (id) => {
   const result = await findUserById(id);
+  return result.rows[0];
+};
+
+export const updateUserProfile = async (id, profileData) => {
+  const result = await updateUser(id, profileData);
+  if (result.rows.length === 0) {
+    throw new Error('User not found');
+  }
   return result.rows[0];
 };

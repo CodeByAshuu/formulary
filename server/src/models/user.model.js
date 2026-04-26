@@ -19,3 +19,10 @@ export const createUser = ({ firstName, lastName, username, email, password }) =
     [firstName, lastName, username, email, password]
   );
 };
+
+export const updateUser = (id, { firstName, lastName }) => {
+  return pool.query(
+    "UPDATE users SET first_name = $1, last_name = $2 WHERE id = $3 RETURNING id, first_name, last_name, email, role, created_at",
+    [firstName, lastName, id]
+  );
+};
