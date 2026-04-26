@@ -18,10 +18,11 @@ CREATE TABLE users (
 -- Create Medicines table
 CREATE TABLE medicines (
   id SERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
+  name VARCHAR(255) NOT NULL UNIQUE,
   composition TEXT NOT NULL,
   manufacturer VARCHAR(255) NOT NULL,
-  price DECIMAL(10, 2) NOT NULL
+  price DECIMAL(10, 2) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create Substitutes table (Many-to-Many self-referencing relationship)

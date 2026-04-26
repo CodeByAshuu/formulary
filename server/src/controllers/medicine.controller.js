@@ -5,7 +5,10 @@ import {
   addMedicineService, 
   updateMedicineService, 
   deleteMedicineService,
-  bulkUploadService 
+  bulkUploadService,
+  getAdminMetricsService,
+  getAllMedicinesService,
+  removeSubstituteService
 } from '../services/medicine.service.js';
 
 export const searchMedicine = async (req, res) => {
@@ -86,6 +89,34 @@ export const deleteMedicine = async (req, res) => {
     if (err.message === 'Medicine not found') {
       return res.status(404).json({ error: err.message });
     }
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getMetrics = async (req, res) => {
+  try {
+    const data = await getAdminMetricsService();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const listAllMedicines = async (req, res) => {
+  try {
+    const data = await getAllMedicinesService();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const removeSubstituteLink = async (req, res) => {
+  try {
+    const { id, subId } = req.params;
+    await removeSubstituteService(parseInt(id), parseInt(subId));
+    res.json({ message: 'Substitute link removed' });
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };

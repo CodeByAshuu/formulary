@@ -34,3 +34,18 @@ export const deleteMedicine = async (id) => {
   const response = await axios.delete(`/medicines/${id}`);
   return response.data;
 };
+
+export const getAdminMetrics = async () => {
+  const response = await axios.get('/medicines/admin/metrics');
+  return response.data;
+};
+
+export const getAllMedicines = async () => {
+  const response = await axios.get('/medicines/admin/all');
+  return response.data;
+};
+
+export const removeSubstituteLink = async (medicineId, substituteId) => {
+  const response = await axios.delete(`/medicines/${medicineId}/substitutes/${substituteId}`);
+  return response.data;
+};

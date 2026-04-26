@@ -60,3 +60,35 @@ export const addSubstitute = (id1, id2) => {
     [minId, maxId]
   );
 };
+
+export const getAdminMetrics = () => {
+  return pool.query(`
+    SELECT 
+      (SELECT COUNT(*) FROM medicines) AS total_medicines,
+      (SELECT COUNT(*) FROM medicines WHERE created_at >= NOW() - INTERVAL '7 days') AS added_this_week,
+      (SELECT COUNT(*) FROM medicines m 
+       WHERE NOT EXISTS (
+         SELECT 1 FROM substitutes s 
+         WHERE s.medicine_id = m.id OR s.substitute_id = m.id
+       )) AS no_substitutes,
+      (SELECT COUNT(*) FROM substitutes) AS total_links
+  `);
+};
+
+export const getAllMedicines = () => {
+  return pool.query(`
+    SELECT m.*, 
+      (SELECT COUNT(*) FROM substitutes s 
+       WHERE s.medicine_id = m.id OR s.substitute_id = m.id) AS substitute_count
+    FROM medicines m
+    ORDER BY m.created_at DESC
+  `);
+};
+
+export const removeSubstitute = (id1, id2) => {
+  const [minId, maxId] = [Math.min(id1, id2), Math.max(id1, id2)];
+  return pool.query(
+    "DELETE FROM substitutes WHERE medicine_id = $1 AND substitute_id = $2",
+    [minId, maxId]
+  );
+};

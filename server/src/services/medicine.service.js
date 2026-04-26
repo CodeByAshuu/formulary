@@ -8,7 +8,10 @@ import {
   updateMedicine, 
   deleteMedicine,
   findMedicinesByComposition,
-  addSubstitute
+  addSubstitute,
+  getAdminMetrics,
+  getAllMedicines,
+  removeSubstitute
 } from '../models/medicine.model.js';
 
 export const searchMedicineService = async (name) => {
@@ -168,4 +171,22 @@ export const deleteMedicineService = async (id) => {
   }
 
   return result.rows[0];
+};
+
+export const getAdminMetricsService = async () => {
+  const result = await getAdminMetrics();
+  return result.rows[0];
+};
+
+export const getAllMedicinesService = async () => {
+  const result = await getAllMedicines();
+  return result.rows;
+};
+
+export const removeSubstituteService = async (id1, id2) => {
+  await removeSubstitute(id1, id2);
+
+  if (redisClient.isReady) {
+    await redisClient.flushDb();
+  }
 };
