@@ -10,7 +10,7 @@ export const findUserByUsername = (username) => {
 };
 
 export const findUserById = (id) => {
-  return pool.query("SELECT id, first_name, last_name, email, username, created_at FROM users WHERE id = $1", [id]);
+  return pool.query("SELECT id, first_name, last_name, email, username, role, created_at FROM users WHERE id = $1", [id]);
 };
 
 export const createUser = ({ firstName, lastName, username, email, password }) => {
