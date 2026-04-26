@@ -14,9 +14,9 @@ function SearchPage() {
   return (
     <div className="dashboard-container">
       {/* Search Header */}
-      <div className="hero-header" style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
+      <div className="hero-header" style={{ minHeight: '60vh'}}>
         <h1 className="display-lg hero-header-gradient" style={{ fontSize: '4rem', marginBottom: '24px' }}>Formulary</h1>
-        <p className="body-lg" style={{ maxWidth: '600px', fontSize: '1.25rem', color: 'var(--on-surface-variant)' }}>
+        <p className="body-lg" style={{ maxWidth: '600px', fontSize: '1.20rem', color: 'var(--on-surface-variant)' }}>
           The Clinical Atelier for Medicine Strategy. Find optimized pricing through molecular equivalents.
         </p>
 
