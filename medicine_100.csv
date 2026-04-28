@@ -1,0 +1,81 @@
+name,composition,manufacturer,price
+Zerodol SP,Aceclofenac + Paracetamol + Serratiopeptidase,Ipca,85
+Hifenac P,Aceclofenac + Paracetamol,Intas,60
+Nicip Plus,Nimesulide + Paracetamol,Cipla,50
+Nise,Nimesulide,Dr Reddy's,45
+Sumo L,Nimesulide + Paracetamol,Alkem,55
+Meftal Spas,Mefenamic Acid + Dicycloverine,Blue Cross,70
+Meftal Forte,Mefenamic Acid,Blue Cross,60
+Cyclopam,Dicycloverine + Paracetamol,Indoco,65
+Buscopan,Hyoscine Butylbromide,Sanofi,75
+No Spa,Drotaverine,Abbott,80
+Drotin M,Drotaverine + Mefenamic Acid,Walter Bushnell,90
+Tramadol 50,Tramadol,Sun Pharma,95
+Ultracet,Tramadol + Paracetamol,J&J,110
+Tapal,Tapentadol,Lupin,120
+Etoshine 90,Etoricoxib,Sun Pharma,85
+Nucoxia 90,Etoricoxib,Zydus,80
+Zyrova 10,Rosuvastatin,Zydus,135
+Storvas 10,Atorvastatin,Sun Pharma,125
+Tonact 10,Atorvastatin,Lupin,120
+Ramistar 5,Ramipril,Lupin,60
+Cardace 5,Ramipril,Sanofi,65
+Losar 50,Losartan,Unichem,55
+Repace 50,Losartan,Sun Pharma,60
+Olmezest 20,Olmesartan,Sun Pharma,75
+Olvance 20,Olmesartan,Micro Labs,70
+Metolar XR 50,Metoprolol,Cipla,65
+Betaloc 50,Metoprolol,AstraZeneca,75
+Tenormin 50,Atenolol,AstraZeneca,60
+Aten 50,Atenolol,Zydus,55
+Diamicron MR,Gliclazide,Servier,95
+Glizid 80,Gliclazide,Panacea,85
+Amaryl 2,Glimepiride,Sanofi,110
+Glimy 2,Glimepiride,Alkem,100
+Istamet,Sitagliptin + Metformin,Sun Pharma,140
+Janumet,Sitagliptin + Metformin,MSD,160
+Forxiga,Dapagliflozin,AstraZeneca,180
+Oxra,Dapagliflozin,Sun Pharma,170
+Lantus,Insulin Glargine,Sanofi,250
+Huminsulin,Human Insulin,Eli Lilly,230
+Thyronorm 50,Levothyroxine,Abbott,45
+Eltroxin 50,Levothyroxine,Glaxo,40
+Euthyrox 50,Levothyroxine,Merck,42
+Calcirol,Calcium + Vitamin D3,Cadila,70
+Shelcal 500,Calcium + Vitamin D3,Torrent,65
+Gemcal,Calcium + Vitamin D3,Alkem,60
+Zincovit,Multivitamin + Zinc,Apex,95
+Revital H,Multivitamin,Sun Pharma,120
+Becosules,Vitamin B Complex,Pfizer,80
+Neurobion Forte,Vitamin B Complex,Merck,85
+Evion 400,Vitamin E,Merck,60
+Limcee,Vitamin C,Abbott,50
+Celin 500,Vitamin C,GSK,45
+Betadine Ointment,Povidone Iodine,Win Medicare,70
+Soframycin,Framycetin,Sanofi,65
+Silverex,Silver Sulfadiazine,Ranbaxy,80
+Candid Cream,Clotrimazole,Glenmark,55
+Canesten Cream,Clotrimazole,Bayer,60
+Nizoral,Ketoconazole,Janssen,90
+Lulifin Cream,Luliconazole,Glenmark,120
+Onabet Cream,Sertaconazole,Glenmark,110
+Atarax 25,Hydroxyzine,Dr Reddy's,50
+Restyl 0.5,Alprazolam,Cipla,45
+Alprax 0.5,Alprazolam,Torrent,40
+Valium 5,Diazepam,Roche,55
+Clonotril 0.5,Clonazepam,Torrent,65
+Serlift 50,Sertraline,Sun Pharma,90
+Zoloft 50,Sertraline,Pfizer,110
+Fludac 20,Fluoxetine,Sun Pharma,85
+Prozac 20,Fluoxetine,Eli Lilly,120
+Nexito 10,Escitalopram,Sun Pharma,95
+Lexapro 10,Escitalopram,Lundbeck,130
+Oleanz 5,Olanzapine,Sun Pharma,100
+Zyprexa 5,Olanzapine,Eli Lilly,140
+Risperdal 2,Risperidone,Janssen,110
+Levipil 500,Levetiracetam,Sun Pharma,150
+Keppra 500,Levetiracetam,UCB,180
+Tegretol 200,Carbamazepine,Novartis,120
+Zeptol 200,Carbamazepine,Sun Pharma,110
+Eptoin 100,Phenytoin,Abbott,80
+Dilantin 100,Phenytoin,Pfizer,90
