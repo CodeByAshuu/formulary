@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getMedicineDetails, getMedicineSubstitutes } from '../api/medicine';
-import '../index.css';
 
 function MedicineDetailPage() {
   const { id } = useParams();
@@ -30,88 +29,181 @@ function MedicineDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-surface flex items-center justify-center">
-        <div className="animate-spin" style={{ width: '48px', height: '48px', border: '5px solid var(--primary)', borderTopColor: 'transparent', borderRadius: '50%' }}></div>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#CDEDB3' }}>
+        <div
+          className="animate-spin rounded-full"
+          style={{ width: 48, height: 48, border: '5px solid #084734', borderTopColor: 'transparent' }}
+        ></div>
       </div>
     );
   }
 
   if (!medicine) {
     return (
-      <div className="min-h-screen bg-surface flex flex-col items-center justify-center gap-4">
-        <h2 className="title-md">Clinical profile not found</h2>
-        <Link to="/" className="btn-primary">Back to Search</Link>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ backgroundColor: '#CDEDB3' }}>
+        <h2 className="text-xl font-semibold" style={{ color: '#084734' }}>Clinical profile not found</h2>
+        <Link
+          to="/"
+          className="px-6 py-2.5 rounded-full text-sm font-bold uppercase tracking-widest transition-all"
+          style={{ backgroundColor: '#084734', color: '#CEF17B' }}
+        >
+          Back to Search
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="dashboard-container">
-      {/* Detail Header Layer / Breadcrumbs */}
-      <div className="hero-header" style={{ paddingBottom: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-          <button onClick={() => navigate(-1)} className="label-sm" style={{ cursor: 'pointer', background: 'transparent', border: 'none', color: 'inherit' }}>&larr; Back to Results</button>
-        </div>
-        
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <div>
-            <h1 className="display-lg hero-header-gradient" style={{ margin: '0 0 8px 0' }}>{medicine.name}</h1>
-            <p className="title-md" style={{ color: 'var(--on-surface-variant)', margin: 0 }}>{medicine.composition}</p>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <span className="chip chip-success" style={{ marginBottom: '8px' }}>Active Molecular Profile</span>
-            <h2 className="headline-sm" style={{ margin: 0, color: 'var(--on-surface)' }}>${medicine.price}</h2>
-            <div className="label-sm">Standard Unit Retail Price</div>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen font-body p-6 sm:p-10 relative overflow-hidden" style={{ backgroundColor: '#CDEDB3', color: '#084734' }}>
 
-      {/* Main Content Area */}
-      <div className="workspace-layer">
-        <h2 className="headline-sm" style={{ marginBottom: '24px' }}>Clinical Profile</h2>
-        
-        {/* Bento Grid - Detail Layout */}
-        <div className="bento-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
-          
-          {/* Overview */}
-          <div className="clinical-card" style={{ gridColumn: 'span 2' }}>
-            <h3 className="title-md" style={{ marginBottom: '12px' }}>Pharmacological Overview</h3>
-            <p className="body-md" style={{ marginBottom: '24px', lineHeight: '1.6' }}>
-              {medicine.description || `This molecular profile for ${medicine.name} (${medicine.composition}) provides verified manufacturer data and pricing strategy. For full contraindications, consult the clinical repository.`}
+      {/* Background blobs */}
+      <div
+        className="absolute top-[-10%] left-[-10%] w-xl h-xl rounded-full pointer-events-none"
+        style={{ backgroundColor: 'rgba(8,71,52,0.07)', filter: 'blur(100px)' }}
+      ></div>
+      <div
+        className="absolute bottom-[-10%] right-[-10%] w-xl h-xl rounded-full pointer-events-none"
+        style={{ backgroundColor: 'rgba(206,241,123,0.3)', filter: 'blur(100px)' }}
+      ></div>
+
+      <div className="max-w-8xl mx-auto relative z-10 space-y-8">
+
+        {/* ── Hero Header ── */}
+        <div
+          className="p-8 rounded-[2.5rem] border relative overflow-hidden"
+          style={{ backgroundColor: '#084734', borderColor: 'rgba(206,241,123,0.2)' }}
+        >
+          {/* Decorative bg icon */}
+          <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
+            <span className="material-symbols-outlined" style={{ fontSize: 120, color: '#CEF17B' }}>medication</span>
+          </div>
+
+          {/* Breadcrumb */}
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest mb-6 transition-opacity hover:opacity-70"
+            style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'rgba(206,241,123,0.7)' }}
+          >
+            &larr; Back to Results
+          </button>
+
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-6 relative z-10">
+            {/* Left — name + composition */}
+            <div className="space-y-2">
+              <div
+                className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest inline-flex items-center gap-1.5 border"
+                style={{ backgroundColor: 'rgba(206,241,123,0.15)', borderColor: 'rgba(206,241,123,0.3)', color: '#CEF17B' }}
+              >
+                <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ backgroundColor: '#CEF17B' }}></span>
+                Active Molecular Profile
+              </div>
+              <h1 className="text-4xl font-bold tracking-tight" style={{ color: '#CEF17B' }}>{medicine.name}</h1>
+              <p className="text-sm font-medium" style={{ color: 'rgba(205,237,179,0.7)' }}>{medicine.composition}</p>
+            </div>
+
+            {/* Right — price */}
+            <div
+              className="px-6 py-4 rounded-2xl border text-right shrink-0"
+              style={{ backgroundColor: 'rgba(206,241,123,0.1)', borderColor: 'rgba(206,241,123,0.25)' }}
+            >
+              <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: 'rgba(205,237,179,0.6)' }}>
+                Standard Unit Retail
+              </p>
+              <p className="text-3xl font-bold" style={{ color: '#CEF17B' }}>${medicine.price}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Section title ── */}
+        <h2 className="text-lg font-semibold px-1" style={{ color: '#084734' }}>Clinical Profile</h2>
+
+        {/* ── Bento Grid ── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          {/* Pharmacological Overview — spans 2 cols */}
+          <div
+            className="md:col-span-2 p-8 rounded-[2.5rem] border space-y-6"
+            style={{ backgroundColor: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(16px)', borderColor: 'rgba(255,255,255,0.5)' }}
+          >
+            <h3 className="text-lg font-semibold" style={{ color: '#084734' }}>Pharmacological Overview</h3>
+            <p className="text-sm leading-relaxed" style={{ color: '#2a6645' }}>
+              {medicine.description ||
+                `This molecular profile for ${medicine.name} (${medicine.composition}) provides verified manufacturer data and pricing strategy. For full contraindications, consult the clinical repository.`}
             </p>
-            
-            <div style={{ display: 'flex', gap: '48px' }}>
-              <div>
-                <div className="label-sm">Manufacturer</div>
-                <div className="body-md" style={{ fontWeight: 600, color: 'var(--on-surface)' }}>{medicine.manufacturer}</div>
-              </div>
-              <div>
-                <div className="label-sm">Composition Status</div>
-                <div className="body-md" style={{ fontWeight: 600, color: 'var(--on-surface)' }}>Exact Molecular Match</div>
-              </div>
+
+            <div
+              className="grid grid-cols-2 gap-4 pt-4 border-t"
+              style={{ borderColor: 'rgba(8,71,52,0.1)' }}
+            >
+              {[
+                { label: 'Manufacturer', value: medicine.manufacturer },
+                { label: 'Composition Status', value: 'Exact Molecular Match' },
+              ].map(({ label, value }) => (
+                <div key={label} className="space-y-1">
+                  <p className="text-[0.65rem] uppercase tracking-widest font-medium" style={{ color: '#2a6645' }}>{label}</p>
+                  <p className="text-sm font-semibold" style={{ color: '#084734' }}>{value}</p>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Action Card */}
-          <div className="clinical-card" style={{ backgroundColor: 'var(--primary-fixed-dim)', border: '1px solid var(--primary-ghost-border)' }}>
-             <h3 className="title-md" style={{ color: 'var(--primary)', marginBottom: '16px' }}>Optimization Analysis</h3>
-             <p className="body-md" style={{ marginBottom: '24px' }}>
-               We have identified <span style={{ fontWeight: 700 }}>{substitutesCount}</span> pharmacological equivalents with varying cost structures.
-             </p>
-             <Link to={`/substitutes/${medicine.id}`} className="btn-primary" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
-               Compare Price Strategy
-             </Link>
+          {/* Optimization Analysis */}
+          <div
+            className="p-8 rounded-[2.5rem] border flex flex-col justify-between space-y-6"
+            style={{ backgroundColor: '#084734', borderColor: 'rgba(206,241,123,0.2)' }}
+          >
+            <div className="space-y-4">
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: 'rgba(206,241,123,0.15)' }}
+              >
+                <span className="material-symbols-outlined text-xl" style={{ color: '#CEF17B' }}>compare_arrows</span>
+              </div>
+              <h3 className="text-base font-semibold" style={{ color: '#CEF17B' }}>Optimization Analysis</h3>
+              <p className="text-sm leading-relaxed" style={{ color: 'rgba(205,237,179,0.7)' }}>
+                We have identified{' '}
+                <span className="font-bold" style={{ color: '#CEF17B' }}>{substitutesCount}</span>{' '}
+                pharmacological equivalents with varying cost structures.
+              </p>
+            </div>
+            <Link
+              to={`/substitutes/${medicine.id}`}
+              className="block text-center px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all"
+              style={{ backgroundColor: '#CEF17B', color: '#084734' }}
+              onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#d8f96a'; }}
+              onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#CEF17B'; }}
+            >
+              Compare Price Strategy
+            </Link>
           </div>
 
-          {/* Bottom Card - Composition Details */}
-          <div className="clinical-card" style={{ gridColumn: '1 / -1' }}>
-             <h3 className="title-md" style={{ marginBottom: '16px' }}>Molecular Repository</h3>
-             <div className="body-md">
-               Manufacturer of Record: <span style={{ fontWeight: 700 }}>{medicine.manufacturer}</span> | 
-               Indexed ID: <span style={{ fontWeight: 700 }}>MED-{medicine.id.toString().padStart(5, '0')}</span> | 
-               Price Verification Index: <span style={{ fontWeight: 700 }}>{new Date().toLocaleDateString()}</span>
-             </div>
+          {/* Molecular Repository — full width */}
+          <div
+            className="md:col-span-3 p-6 rounded-4xl border flex flex-wrap items-center gap-x-8 gap-y-3"
+            style={{ backgroundColor: 'rgba(255,255,255,0.45)', borderColor: 'rgba(8,71,52,0.1)' }}
+          >
+            <span className="material-symbols-outlined text-lg pb-2" style={{ color: '#084734' }}>biotech</span>
+            <div className="w-px h-8 hidden sm:block" style={{ backgroundColor: 'rgba(8,71,52,0.15)' }}></div>
+            <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: '#084734' }}>Molecular Repository</h3>
+            <div
+              className="w-px h-4 hidden sm:block"
+              style={{ backgroundColor: 'rgba(8,71,52,0.2)' }}
+            ></div>
+            {[
+              { label: 'Manufacturer of Record', value: medicine.manufacturer },
+              { label: 'Indexed ID', value: `MED-${medicine.id.toString().padStart(5, '0')}` },
+              { label: 'Price Verification Index', value: new Date().toLocaleDateString() },
+            ].map(({ label, value }, i) => (
+              <div key={label} className="flex items-center gap-2">
+                {i > 0 && (
+                  <div className="w-px h-4 hidden sm:block" style={{ backgroundColor: 'rgba(8,71,52,0.15)' }}></div>
+                )}
+                <span className="text-[10px] uppercase tracking-widest font-medium" style={{ color: '#2a6645' }}>{label}:</span>
+                <span className="text-xs font-bold" style={{ color: '#084734' }}>{value}</span>
+              </div>
+            ))}
           </div>
+
         </div>
       </div>
     </div>

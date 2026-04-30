@@ -147,8 +147,15 @@ function SearchPage() {
 
   const handleSearch = (e) => {
     if (e.key === 'Enter' && searchTerm.trim()) {
-      navigate(`/search-results?q=${encodeURIComponent(searchTerm.trim())}`);
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/signin");
+      return;
     }
+
+    navigate(`/search-results?q=${encodeURIComponent(searchTerm.trim())}`);
+  }
   };
 
   return (
