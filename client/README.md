@@ -1,65 +1,172 @@
-# React + Vite
+# Prompt: Implement Redis Caching in Medicine Alternatives Backend (PERN)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Context
 
-Currently, two official plugins are available:
+You are building a backend system (Node.js + Express + PostgreSQL) for a healthcare platform that:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Allows users to search medicines  
+- Fetch substitute medicines  
+- Compare prices  
 
-## React Compiler
+The system is **read-heavy**, meaning:
+- Many users will search the same medicines repeatedly  
+- Substitute queries will be called frequently  
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+To improve performance and reduce database load, you must integrate **Redis caching**.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Objective
+
+Implement Redis caching to:
+
+- Reduce response time  
+- Minimize repeated database queries  
+- Improve scalability  
+
+---
+
+## Tech Stack
+
+- React + TailwindCSS
+- Node.js + Express  
+- PostgreSQL  
+- Redis  
+
+---
+
+## What to Implement
+
+### 1. Redis Setup
+
+- Install Redis client (`redis` npm package)  
+- Create a reusable Redis connection module  
+
+Example requirement:
+- Single Redis client instance  
+- Handle connection errors  
+- Export client for reuse  
+
+---
+
+### 2. Caching Strategy
+
+#### Cache these endpoints:
+
+1. **Search Medicines**
+   - Endpoint: `/api/medicines/search?q=...`
+   - Cache key:
+     ```
+     search:<query>
+     ```
+
+2. **Get Substitutes**
+   - Endpoint: `/api/medicines/:id/substitutes`
+   - Cache key:
+     ```
+     substitutes:<medicine_id>
+     ```
+
+---
+
+### 3. Cache Flow (IMPORTANT)
+
+For each request:
+
+#### Step 1: Check cache
+- If data exists → return cached response  
+
+#### Step 2: If not found
+- Query PostgreSQL  
+- Store result in Redis  
+
+#### Step 3: Return response  
+
+---
+
+### 4. Cache Expiration
+
+- Set TTL (Time To Live):
+  - 60–300 seconds (configurable)
+
+Example:
+- Search → 60s  
+- Substitutes → 120s  
+
+---
+
+### 5. Cache Invalidation (VERY IMPORTANT)
+
+Whenever admin modifies data:
+
+#### On:
+- Add medicine  
+- Update medicine  
+- Delete medicine  
+- Upload CSV  
+
+You must:
+- Clear relevant cache OR
+- Use pattern-based invalidation  
+
+Example:
+Delete keys starting with:
+search:*
+substitutes:*
 
 
-.search-wrapper { position: relative; z-index: 1; width: 100%; max-width: 600px; }
+---
 
-  .search-box {
-    display: flex; align-items: center;
-    background: rgba(255,255,255,0.07);
-    border: 1.5px solid rgba(206,241,123,0.4);
-    border-radius: 16px; padding: 6px 6px 6px 20px; gap: 12px;
-    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
-    backdrop-filter: blur(8px);
-  }
-  .search-box:focus-within {
-    border-color: var(--accent);
-    background: rgba(255,255,255,0.11);
-    box-shadow: 0 0 0 4px rgba(206,241,123,0.15), 0 8px 32px rgba(0,0,0,0.25);
-  }
+### 6. Error Handling
 
-  .ghost-input {
-    flex: 1; background: transparent; border: none; outline: none;
-    font-family: 'DM Sans', sans-serif; font-size: 1rem;
-    color: #ffffff; caret-color: var(--accent);
-  }
-  .ghost-input::placeholder { color: rgba(205,237,179,0.5); }
+- If Redis fails:
+  - System should still work using DB  
+- Do not crash application  
 
-  .search-hint {
-    margin-top: 14px; font-size: 0.78rem;
-    color: rgba(205,237,179,0.6); letter-spacing: 0.02em;
-  }
-  .search-hint strong { color: var(--accent); font-weight: 600; }
+---
 
+### 7. Code Structure
 
-        <div className="search-wrapper">
-            <div className="search-box">
-              <span className="material-symbols-outlined" style={{ color: 'rgba(206,241,123,0.7)', fontSize: 22 }}>search</span>
-              <input
-                type="text"
-                className="ghost-input"
-                placeholder="Search medicine (e.g., Paracetamol)..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={handleSearch}
-                autoFocus
-              />
-            </div>
-            <div className="search-hint">
-              Press <strong>Enter</strong> to start Molecular Search
-            </div>
-          </div>
+Organize Redis logic cleanly:
+
+- `/config/redis.js` → connection  
+- `/utils/cache.js` → helper functions  
+- Use inside services/controllers  
+
+---
+
+## Expected Behavior
+
+- First request → slower (DB hit)  
+- Subsequent requests → faster (cache hit)  
+
+---
+
+## Performance Goal
+
+- Reduce repeated DB queries  
+- Improve response time for frequent searches  
+
+---
+
+## Constraints
+
+- Do not over-cache everything  
+- Only cache read-heavy endpoints  
+- Ensure consistency after updates  
+
+---
+
+## Final Objective
+
+Build a caching layer that:
+
+- Improves performance  
+- Reduces DB load  
+- Maintains correctness after updates  
+
+---
+
+## Key Insight
+
+> Redis is used to optimize **read operations**, not replace your database.
