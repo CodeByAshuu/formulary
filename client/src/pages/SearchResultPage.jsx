@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { searchMedicines } from '../api/medicine';
-import '../index.css';
 
 function SearchResultPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -9,7 +8,6 @@ function SearchResultPage() {
   const [searchTerm, setSearchTerm] = useState(query);
   const [medicines, setMedicines] = useState([]);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -34,75 +32,106 @@ function SearchResultPage() {
   };
 
   return (
-    <div className="dashboard-container">
-      {/* Ghost Input Header */}
-      <div className="hero-header" style={{ paddingBottom: '24px' }}>
-         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
-           <h1 className="title-md" style={{ margin: 0, color: 'var(--primary)' }}>Formulary Search</h1>
-           <span className="chip chip-action" style={{ fontSize: '0.6rem' }}>Clinical View</span>
-         </div>
-         <div className="ghost-input-container">
+    <div className="min-h-screen bg-[#CDEDB3]">
+
+      {/* ── Hero Header ── */}
+      <div className="relative bg-[#084734] px-8 pt-8 pb-20 overflow-hidden">
+        {/* blob */}
+        <div className="absolute -top-28 -right-16 w-96 h-96 rounded-full bg-[radial-gradient(circle,rgba(206,241,123,0.13)_0%,transparent_70%)] pointer-events-none" />
+        {/* bottom fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-b from-transparent to-[#CDEDB3] pointer-events-none" />
+
+        {/* title row */}
+        <div className="relative z-10 flex items-center gap-3 mb-5">
+          <h1 className="font-serif text-2xl text-white tracking-wide">Formu<em class="text-[#CEF17B]">lary</em> Search</h1>
+          <span className="text-[10px] font-semibold uppercase tracking-widest bg-[rgba(206,241,123,0.15)] border border-[rgba(206,241,123,0.35)] text-[#CEF17B] px-3 py-1 rounded-full">
+            Clinical View
+          </span>
+        </div>
+
+        {/* search box */}
+        <div className="relative z-10 flex items-center max-w-xl bg-white/[0.07] border border-[rgba(206,241,123,0.35)] rounded-2xl px-5 py-4 gap-3 focus-within:border-[#CEF17B] focus-within:shadow-[0_0_0_4px_rgba(206,241,123,0.12)] transition-all">
+          <span className="material-symbols-outlined text-[rgba(206,241,123,0.65)] text-xl">search</span>
           <input
             type="text"
-            className="ghost-input"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={handleSearch}
             placeholder="Search medicine (e.g., Paracetamol)..."
+            className="flex-1 bg-transparent border-none outline-none text-white placeholder-[rgba(205,237,179,0.45)] text-sm caret-[#CEF17B]"
           />
+          <span className="text-[10px] text-[rgba(205,237,179,0.5)] border border-[rgba(205,237,179,0.2)] rounded px-2 py-0.5 whitespace-nowrap">
+            Press <strong className="text-[#CEF17B]">Enter</strong>
+          </span>
         </div>
       </div>
 
-      {/* Results Layer */}
-      <div className="workspace-layer">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <div>
-            <h2 className="headline-sm" style={{ margin: 0 }}>Results for "{query}"</h2>
-            <p className="body-md" style={{ margin: '4px 0 0 0' }}>
-              {loading ? 'Searching...' : `Found ${medicines.length} clinical profiles.`}
-            </p>
-          </div>
+      {/* ── Results ── */}
+      <div className="max-w-8xl mx-auto px-8 py-6 pb-16">
+
+        {/* meta */}
+        <div className="mb-6">
+          <h2 className="font-serif text-xl text-[#084734]">Results for "{query}"</h2>
+          <p className="text-sm text-[#3a6652] mt-1">
+            {loading ? 'Searching...' : `Found ${medicines.length} clinical profiles.`}
+          </p>
         </div>
 
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '100px' }}>
-            <div className="animate-spin" style={{ width: '40px', height: '40px', border: '4px solid var(--primary)', borderTopColor: 'transparent', borderRadius: '50%', margin: '0 auto' }}></div>
-          </div>
-        ) : (
-          <div className="bento-grid">
+        {/* spinner */}
+        {loading && (
+          <div className="w-9 h-9 border-[3px] border-[rgba(8,71,52,0.15)] border-t-[#084734] rounded-full animate-spin mx-auto mt-20" />
+        )}
+
+        {/* grid */}
+        {!loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {medicines.map((med) => (
-              <div key={med.id} className="clinical-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div
+                key={med.id}
+                className="group relative bg-white border border-[rgba(8,71,52,0.1)] rounded-2xl p-6 flex flex-col gap-4 shadow-sm hover:-translate-y-1 hover:shadow-lg transition-all overflow-hidden"
+              >
+                {/* accent bar */}
+                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#084734] to-[#CEF17B] opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                {/* name + composition */}
+                <div>
+                  <div className="font-serif text-lg text-[#084734] mb-1">{med.name}</div>
+                  <div className="text-xs text-[#3a6652] leading-relaxed">{med.composition}</div>
+                </div>
+
+                <div className="h-px bg-[rgba(8,71,52,0.08)]" />
+
+                {/* manufacturer + price */}
+                <div className="flex justify-between items-end">
                   <div>
-                    <h3 className="title-md" style={{ margin: '0 0 4px 0' }}>{med.name}</h3>
-                    <div className="body-md">{med.composition}</div>
+                    <div className="text-[10px] font-semibold uppercase tracking-widest text-[#3a6652] mb-1">Manufacturer</div>
+                    <div className="text-sm font-medium text-[#0c2e22]">{med.manufacturer}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[10px] font-semibold uppercase tracking-widest text-[#3a6652] mb-1">Retail Price</div>
+                    <div className="font-serif text-2xl text-[#084734]">${med.price}</div>
                   </div>
                 </div>
 
-                <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <div>
-                      <div className="label-sm">Manufacturer</div>
-                      <div className="body-md" style={{ color: 'var(--on-surface)' }}>{med.manufacturer}</div>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div className="label-sm">Retail Price</div>
-                      <div className="title-md" style={{ color: 'var(--primary)' }}>${med.price}</div>
-                    </div>
-                  </div>
-
-                  <Link to={`/medicine/${med.id}`} className="btn-primary" style={{ textAlign: 'center', textDecoration: 'none' }}>
-                    View Clinical Profile
-                  </Link>
-                </div>
+                {/* CTA */}
+                <Link
+                  to={`/medicine/${med.id}`}
+                  className="block text-center bg-[#084734] text-[#CEF17B] text-[11px] font-semibold uppercase tracking-widest py-3 rounded-xl hover:bg-[#0a5c44] hover:scale-[1.01] transition-all"
+                >
+                  View Clinical Profile
+                </Link>
               </div>
             ))}
 
-            {medicines.length === 0 && !loading && (
-               <div className="clinical-card" style={{ gridColumn: 'span 2', textAlign: 'center', padding: '60px' }}>
-                  <h3 className="title-md">No results found</h3>
-                  <p className="body-md">Try searching for a different name or composition.</p>
-               </div>
+            {/* empty state */}
+            {medicines.length === 0 && (
+              <div className="col-span-full bg-white border border-[rgba(8,71,52,0.1)] rounded-2xl p-16 text-center">
+                <div className="w-14 h-14 rounded-2xl bg-[#CDEDB3] flex items-center justify-center mx-auto mb-5">
+                  <span className="material-symbols-outlined text-[#084734] text-3xl">search_off</span>
+                </div>
+                <div className="font-serif text-lg text-[#084734] mb-2">No results found</div>
+                <p className="text-sm text-[#3a6652]">Try searching for a different name or composition.</p>
+              </div>
             )}
           </div>
         )}
