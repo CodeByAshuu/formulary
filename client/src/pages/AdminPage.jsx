@@ -1,62 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  addMedicine, 
-  bulkUploadMedicines, 
-  getAdminMetrics, 
-  getAllMedicines, 
-  updateMedicine, 
-  deleteMedicine,
-  getMedicineSubstitutes,
-  removeSubstituteLink
+import {
+  addMedicine, bulkUploadMedicines, getAdminMetrics,
+  getAllMedicines, updateMedicine, deleteMedicine,
+  getMedicineSubstitutes, removeSubstituteLink
 } from '../api/medicine';
-import '../index.css';
 
 function AdminPage() {
-  // --- State ---
-  const [metrics, setMetrics] = useState(null);
-  const [medicines, setMedicines] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState(null);
-
-  // Add form
-  const [formData, setFormData] = useState({ name: '', composition: '', manufacturer: '', price: '' });
-  
-  // Bulk upload
-  const [csvData, setCsvData] = useState('');
-  const [fileName, setFileName] = useState('');
-  const [summary, setSummary] = useState(null);
-
-  // Edit modal
-  const [editModal, setEditModal] = useState(null);
-  const [editForm, setEditForm] = useState({ name: '', composition: '', manufacturer: '', price: '' });
-
-  // Substitute modal
-  const [subModal, setSubModal] = useState(null);
-  const [subs, setSubs] = useState([]);
+  const [metrics, setMetrics]       = useState(null);
+  const [medicines, setMedicines]   = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [status, setStatus]         = useState(null);
+  const [formData, setFormData]     = useState({ name: '', composition: '', manufacturer: '', price: '' });
+  const [csvData, setCsvData]       = useState('');
+  const [fileName, setFileName]     = useState('');
+  const [summary, setSummary]       = useState(null);
+  const [editModal, setEditModal]   = useState(null);
+  const [editForm, setEditForm]     = useState({ name: '', composition: '', manufacturer: '', price: '' });
+  const [subModal, setSubModal]     = useState(null);
+  const [subs, setSubs]             = useState([]);
   const [subsLoading, setSubsLoading] = useState(false);
-
-  // Active tab
-  const [activeTab, setActiveTab] = useState('table');
-
-  // Search / filter
+  const [activeTab, setActiveTab]   = useState('table');
   const [searchFilter, setSearchFilter] = useState('');
 
-  // --- Data Fetching ---
   const fetchDashboard = async () => {
     try {
       const [m, all] = await Promise.all([getAdminMetrics(), getAllMedicines()]);
-      setMetrics(m);
-      setMedicines(all);
-    } catch (err) {
-      console.error('Dashboard fetch failed:', err);
-    } finally {
-      setLoading(false);
-    }
+      setMetrics(m); setMedicines(all);
+    } catch (err) { console.error(err); }
+    finally { setLoading(false); }
   };
-
   useEffect(() => { fetchDashboard(); }, []);
 
-  // --- Handlers ---
   const clearStatus = () => setTimeout(() => setStatus(null), 4000);
 
   const handleSingleSubmit = async () => {
@@ -69,9 +43,7 @@ function AdminPage() {
       setStatus({ type: 'success', message: 'Medicine added & substitutes auto-linked.' }); clearStatus();
       setFormData({ name: '', composition: '', manufacturer: '', price: '' });
       fetchDashboard();
-    } catch (err) {
-      setStatus({ type: 'error', message: err.response?.data?.error || 'Failed.' }); clearStatus();
-    }
+    } catch (err) { setStatus({ type: 'error', message: err.response?.data?.error || 'Failed.' }); clearStatus(); }
   };
 
   const handleFileChange = (e) => {
@@ -79,7 +51,7 @@ function AdminPage() {
     if (file) {
       setFileName(file.name);
       const reader = new FileReader();
-      reader.onload = (event) => setCsvData(event.target.result);
+      reader.onload = (ev) => setCsvData(ev.target.result);
       reader.readAsText(file);
     }
   };
@@ -90,22 +62,16 @@ function AdminPage() {
       const result = await bulkUploadMedicines(csvData);
       setSummary(result);
       setStatus({ type: 'success', message: `Batch complete. ${result.inserted} synced, ${result.failed} failed.` }); clearStatus();
-      setCsvData(''); setFileName('');
-      fetchDashboard();
-    } catch (err) {
-      setStatus({ type: 'error', message: err.response?.data?.error || 'Bulk upload failed.' }); clearStatus();
-    }
+      setCsvData(''); setFileName(''); fetchDashboard();
+    } catch (err) { setStatus({ type: 'error', message: err.response?.data?.error || 'Bulk upload failed.' }); clearStatus(); }
   };
 
   const handleDelete = async (id, name) => {
-    if (!window.confirm(`Permanently delete "${name}"? This will also remove all its substitute links.`)) return;
+    if (!window.confirm(`Permanently delete "${name}"?`)) return;
     try {
       await deleteMedicine(id);
-      setStatus({ type: 'success', message: `"${name}" deleted.` }); clearStatus();
-      fetchDashboard();
-    } catch (err) {
-      setStatus({ type: 'error', message: err.response?.data?.error || 'Delete failed.' }); clearStatus();
-    }
+      setStatus({ type: 'success', message: `"${name}" deleted.` }); clearStatus(); fetchDashboard();
+    } catch (err) { setStatus({ type: 'error', message: 'Delete failed.' }); clearStatus(); }
   };
 
   const openEditModal = (med) => {
@@ -117,20 +83,14 @@ function AdminPage() {
     try {
       await updateMedicine(editModal.id, { ...editForm, price: parseFloat(editForm.price) });
       setStatus({ type: 'success', message: `"${editForm.name}" updated.` }); clearStatus();
-      setEditModal(null);
-      fetchDashboard();
-    } catch (err) {
-      setStatus({ type: 'error', message: err.response?.data?.error || 'Update failed.' }); clearStatus();
-    }
+      setEditModal(null); fetchDashboard();
+    } catch (err) { setStatus({ type: 'error', message: 'Update failed.' }); clearStatus(); }
   };
 
   const openSubModal = async (med) => {
-    setSubModal(med);
-    setSubsLoading(true);
-    try {
-      const data = await getMedicineSubstitutes(med.id);
-      setSubs(data);
-    } catch { setSubs([]); }
+    setSubModal(med); setSubsLoading(true);
+    try { const data = await getMedicineSubstitutes(med.id); setSubs(data); }
+    catch { setSubs([]); }
     finally { setSubsLoading(false); }
   };
 
@@ -138,11 +98,8 @@ function AdminPage() {
     try {
       await removeSubstituteLink(subModal.id, subId);
       setSubs(subs.filter(s => s.id !== subId));
-      setStatus({ type: 'success', message: 'Link removed.' }); clearStatus();
-      fetchDashboard();
-    } catch (err) {
-      setStatus({ type: 'error', message: 'Failed to remove link.' }); clearStatus();
-    }
+      setStatus({ type: 'success', message: 'Link removed.' }); clearStatus(); fetchDashboard();
+    } catch { setStatus({ type: 'error', message: 'Failed to remove link.' }); clearStatus(); }
   };
 
   const filteredMedicines = medicines.filter(m =>
@@ -151,216 +108,248 @@ function AdminPage() {
     m.manufacturer.toLowerCase().includes(searchFilter.toLowerCase())
   );
 
-  // --- Loading State ---
-  if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'var(--surface)' }}>
-        <div style={{ width: 48, height: 48, border: '4px solid var(--primary)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-      </div>
-    );
+  const styles = `
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --primary: #084734;
+    --accent: #CEF17B;
+    --bg-soft: #CDEDB3;
+    --bg-page: #f0f9ea;
+    --text-main: #0c2e22;
+    --text-muted: #3a6652;
+    --border: rgba(8,71,52,0.12);
   }
+    .hero-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.8rem, 6vw, 4.2rem);
+      color: #ffffff; line-height: 1.05;
+      position: relative; z-index: 1; margin-bottom: 20px;
+    }
+    .hero-title em { font-style: italic; color: var(--accent); }
+  `;
 
-  // --- Render ---
+  // ── Shared input style ──
+  const inputCls = `w-full bg-white border border-[rgba(8,71,52,0.2)] rounded-xl px-4 py-2.5 text-sm text-[#0c2e22]
+    placeholder-[#3a6652]/50 outline-none focus:border-[#084734] focus:ring-2 focus:ring-[rgba(8,71,52,0.1)] transition-all`;
+
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-[#CDEDB3]">
+      <div className="w-12 h-12 rounded-full border-4 border-[rgba(8,71,52,0.15)] border-t-[#084734] animate-spin" />
+    </div>
+  );
+
   return (
-    <div className="dashboard-container">
+    <>
+    <style>{styles}</style>
 
-      {/* ─── HEADER ─── */}
-      <div className="hero-header" style={{ paddingBottom: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+    <div className="min-h-screen bg-[#CDEDB3]">
+
+      {/* ── Hero Header ── */}
+      <div className="relative bg-[#084734] px-8 pt-8 pb-14 overflow-hidden">
+        <div className="absolute -top-28 -right-16 w-96 h-96 rounded-full pointer-events-none"
+          style={{ background: 'radial-gradient(circle, rgba(206,241,123,0.13) 0%, transparent 70%)' }} />
+        <div className="absolute bottom-0 left-0 right-0 h-12 pointer-events-none"
+          style={{ background: 'linear-gradient(to bottom, transparent, #CDEDB3)' }} />
+
+        <div className="relative z-10 flex flex-wrap items-start justify-between gap-4 mb-4">
           <div>
-            <h1 className="display-lg hero-header-gradient" style={{ margin: '8px 0' }}>Clinical Admin</h1>
-            <p className="body-md" style={{ color: 'var(--on-surface-variant)', maxWidth: '500px' }}>
+            <div className="inline-flex items-center gap-1.5 mb-6 px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-widest text-[#CEF17B] border border-[rgba(206,241,123,0.35)] bg-[rgba(206,241,123,0.15)]">
+              {/* <span className="material-symbols-outlined" style={{ fontSize: 12 }}>admin_panel_settings</span> */}
+              Administrator
+            </div>
+            <h1 className="hero-title">Clini<em className="font-light text-[#CEF17B]">cal</em> Admin</h1>
+            <p className="text-sm text-[rgba(205,237,179,0.75)] font-light max-w-md">
               Govern master formulary datasets, molecular linkages, and system analytics.
             </p>
           </div>
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <button className={`btn-primary`} style={{ background: activeTab === 'table' ? '' : 'var(--surface-container-high)', color: activeTab === 'table' ? 'white' : 'var(--primary)', boxShadow: activeTab === 'table' ? '' : 'none' }} onClick={() => setActiveTab('table')}>
-              <span className="material-symbols-outlined" style={{ fontSize: '18px', verticalAlign: 'middle', marginRight: '6px' }}>medication</span>
-              Medicines
-            </button>
-            <button className={`btn-primary`} style={{ background: activeTab === 'actions' ? '' : 'var(--surface-container-high)', color: activeTab === 'actions' ? 'white' : 'var(--primary)', boxShadow: activeTab === 'actions' ? '' : 'none' }} onClick={() => setActiveTab('actions')}>
-              <span className="material-symbols-outlined" style={{ fontSize: '18px', verticalAlign: 'middle', marginRight: '6px' }}>add_circle</span>
-              Add / Upload
-            </button>
+
+          {/* Tab switcher */}
+          <div className="flex gap-2 relative z-10">
+            {[
+              { id: 'table',   icon: 'medication',   label: 'Medicines' },
+              { id: 'actions', icon: 'add_circle',    label: 'Add / Upload' },
+            ].map(tab => (
+              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-widest transition-all
+                  ${activeTab === tab.id
+                    ? 'bg-[#CEF17B] text-[#084734]'
+                    : 'bg-white/10 text-[rgba(205,237,179,0.75)] hover:bg-white/20 border border-[rgba(206,241,123,0.2)]'}`}>
+                <span className="material-symbols-outlined" style={{ fontSize: 16 }}>{tab.icon}</span>
+                {tab.label}
+              </button>
+            ))}
           </div>
         </div>
 
+        {/* Status banner */}
         {status && (
-          <div style={{ marginTop: '16px', padding: '12px 20px', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '8px',
-            background: status.type === 'error' ? '#fdecea' : status.type === 'success' ? '#e8f5e9' : 'var(--surface-container-high)',
-            color: status.type === 'error' ? '#c62828' : status.type === 'success' ? '#2e7d32' : 'var(--on-surface)',
-            border: `1px solid ${status.type === 'error' ? '#ef9a9a' : status.type === 'success' ? '#a5d6a7' : 'var(--outline-variant)'}` }}>
-            <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
+          <div className={`relative z-10 mt-3 flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold border
+            ${status.type === 'error'   ? 'bg-red-50 text-red-700 border-red-200' :
+              status.type === 'success' ? 'bg-[#e8f5e9] text-[#2e7d32] border-[#a5d6a7]' :
+                                          'bg-white/10 text-white border-white/20'}`}>
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
               {status.type === 'error' ? 'error' : status.type === 'loading' ? 'speed' : 'check_circle'}
             </span>
-            <span className="body-md" style={{ fontWeight: 600 }}>{status.message}</span>
+            {status.message}
           </div>
         )}
       </div>
 
-      <div className="workspace-layer">
-        
-        {/* ─── METRICS ROW ─── */}
+      {/* ── Main ── */}
+      <div className="max-w-8xl mx-auto px-8 pb-16">
+
+        {/* Metrics */}
         {metrics && (
-          <div className="bento-grid" style={{ marginBottom: '32px', gridTemplateColumns: 'repeat(4, 1fr)' }}>
-            <div className="clinical-card" style={{ textAlign: 'center' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: '32px', color: 'var(--primary)', marginBottom: '8px' }}>medication</span>
-              <h2 className="display-lg" style={{ color: 'var(--on-surface)', margin: '4px 0' }}>{metrics.total_medicines}</h2>
-              <div className="label-sm">Total Medicines</div>
-            </div>
-            <div className="clinical-card" style={{ textAlign: 'center' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: '32px', color: 'var(--tertiary)', marginBottom: '8px' }}>trending_up</span>
-              <h2 className="display-lg" style={{ color: 'var(--on-surface)', margin: '4px 0' }}>{metrics.added_this_week}</h2>
-              <div className="label-sm">Added This Week</div>
-            </div>
-            <div className="clinical-card" style={{ textAlign: 'center' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: '32px', color: '#e65100', marginBottom: '8px' }}>warning</span>
-              <h2 className="display-lg" style={{ color: 'var(--on-surface)', margin: '4px 0' }}>{metrics.no_substitutes}</h2>
-              <div className="label-sm">No Substitutes</div>
-            </div>
-            <div className="clinical-card" style={{ textAlign: 'center' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: '32px', color: 'var(--primary)', marginBottom: '8px' }}>hub</span>
-              <h2 className="display-lg" style={{ color: 'var(--on-surface)', margin: '4px 0' }}>{metrics.total_links}</h2>
-              <div className="label-sm">Substitute Links</div>
-            </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {[
+              { icon: 'medication',   color: '#084734', label: 'Total Medicines',  value: metrics.total_medicines },
+              { icon: 'trending_up',  color: '#0a5c44', label: 'Added This Week',  value: metrics.added_this_week },
+              { icon: 'warning',      color: '#b45309', label: 'No Substitutes',   value: metrics.no_substitutes },
+              { icon: 'hub',          color: '#084734', label: 'Substitute Links', value: metrics.total_links },
+            ].map(({ icon, color, label, value }) => (
+              <div key={label} className="bg-white border border-[rgba(8,71,52,0.1)] rounded-2xl p-6 text-center shadow-sm">
+                <span className="material-symbols-outlined" style={{ fontSize: 32, color, marginBottom: 8, display: 'block' }}>{icon}</span>
+                <div className="font-serif text-3xl text-[#084734] my-1">{value}</div>
+                <div className="text-[10px] font-semibold uppercase tracking-widest text-[#3a6652]">{label}</div>
+              </div>
+            ))}
           </div>
         )}
 
-        {/* ─── TAB: MEDICINES TABLE ─── */}
+        {/* ── TAB: Table ── */}
         {activeTab === 'table' && (
-          <div className="clinical-card" style={{ padding: 0, overflow: 'hidden' }}>
-            {/* Table Header Bar */}
-            <div style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--outline-variant)' }}>
-              <h3 className="title-md" style={{ margin: 0 }}>Medicines Master Registry</h3>
-              <div className="ghost-input-container" style={{ margin: 0, maxWidth: '300px' }}>
-                <input
-                  type="text"
-                  className="ghost-input"
-                  placeholder="Filter by name, composition, manufacturer..."
-                  value={searchFilter}
-                  onChange={(e) => setSearchFilter(e.target.value)}
-                  style={{ padding: '8px 12px', fontSize: '0.8125rem' }}
-                />
-              </div>
+          <div className="bg-white border border-[rgba(8,71,52,0.1)] rounded-2xl overflow-hidden shadow-sm">
+            {/* Table top bar */}
+            <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4 border-b border-[rgba(8,71,52,0.08)]">
+              <h3 className="font-serif text-lg text-[#084734]">Medicines Master Registry</h3>
+              <input
+                type="text"
+                placeholder="Filter by name, composition, manufacturer..."
+                value={searchFilter}
+                onChange={(e) => setSearchFilter(e.target.value)}
+                className={`${inputCls} max-w-xs`}
+              />
             </div>
 
-            {/* Table */}
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
                 <thead>
-                  <tr style={{ background: 'var(--surface-container-low)', textAlign: 'left' }}>
-                    <th style={{ padding: '12px 24px', fontWeight: 600, color: 'var(--on-surface-variant)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Name</th>
-                    <th style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--on-surface-variant)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Composition</th>
-                    <th style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--on-surface-variant)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Manufacturer</th>
-                    <th style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--on-surface-variant)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Price</th>
-                    <th style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--on-surface-variant)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Subs</th>
-                    <th style={{ padding: '12px 24px', fontWeight: 600, color: 'var(--on-surface-variant)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'right' }}>Actions</th>
+                  <tr className="bg-[#CDEDB3]/40 text-left">
+                    {['Name', 'Composition', 'Manufacturer', 'Price', 'Subs', 'Actions'].map((h, i) => (
+                      <th key={h} className={`px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-[#3a6652] ${i === 5 ? 'text-right' : ''}`}>{h}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
                   {filteredMedicines.length === 0 ? (
-                    <tr><td colSpan="6" style={{ padding: '40px', textAlign: 'center', color: 'var(--on-surface-variant)' }}>No medicines match your filter.</td></tr>
-                  ) : (
-                    filteredMedicines.map((med, idx) => (
-                      <tr key={med.id} style={{ borderBottom: '1px solid var(--outline-variant)', background: idx % 2 === 0 ? 'var(--surface)' : 'var(--surface-container-lowest, #fff)' }}>
-                        <td style={{ padding: '14px 24px', fontWeight: 600, color: 'var(--on-surface)' }}>{med.name}</td>
-                        <td style={{ padding: '14px 16px', color: 'var(--on-surface-variant)' }}>{med.composition}</td>
-                        <td style={{ padding: '14px 16px', color: 'var(--on-surface-variant)' }}>{med.manufacturer}</td>
-                        <td style={{ padding: '14px 16px', color: 'var(--on-surface)', fontWeight: 600 }}>${med.price}</td>
-                        <td style={{ padding: '14px 16px' }}>
-                          <span className="chip chip-action" style={{ cursor: 'pointer', padding: '4px 10px', fontSize: '0.75rem' }} onClick={() => openSubModal(med)}>
-                            {med.substitute_count} links
-                          </span>
-                        </td>
-                        <td style={{ padding: '14px 24px', textAlign: 'right' }}>
-                          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                            <button onClick={() => openEditModal(med)} style={{ background: 'none', border: '1px solid var(--outline-variant)', borderRadius: 'var(--radius-sm)', padding: '6px 8px', cursor: 'pointer', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem' }}>
-                              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>edit</span>Edit
-                            </button>
-                            <button onClick={() => handleDelete(med.id, med.name)} style={{ background: 'none', border: '1px solid #ef9a9a', borderRadius: 'var(--radius-sm)', padding: '6px 8px', cursor: 'pointer', color: '#c62828', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem' }}>
-                              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>delete</span>Delete
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
+                    <tr><td colSpan={6} className="py-12 text-center text-[#3a6652] text-sm">No medicines match your filter.</td></tr>
+                  ) : filteredMedicines.map((med, idx) => (
+                    <tr key={med.id} className={`border-t border-[rgba(8,71,52,0.06)] hover:bg-[#CDEDB3]/20 transition-colors ${idx % 2 === 1 ? 'bg-[#f7fbf4]' : ''}`}>
+                      <td className="px-6 py-3.5 font-semibold text-[#084734]">{med.name}</td>
+                      <td className="px-6 py-3.5 text-[#3a6652]">{med.composition}</td>
+                      <td className="px-6 py-3.5 text-[#3a6652]">{med.manufacturer}</td>
+                      <td className="px-6 py-3.5 font-semibold text-[#084734]">${med.price}</td>
+                      <td className="px-6 py-3.5">
+                        <button onClick={() => openSubModal(med)}
+                          className="px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-[rgba(8,71,52,0.08)] text-[#084734] hover:bg-[#CEF17B] transition-colors">
+                          {med.substitute_count} links
+                        </button>
+                      </td>
+                      <td className="px-6 py-3.5">
+                        <div className="flex gap-2 justify-end">
+                          <button onClick={() => openEditModal(med)}
+                            className="flex items-center gap-1 px-3 py-1.5 text-[11px] font-medium rounded-lg border border-[rgba(8,71,52,0.2)] text-[#084734] hover:bg-[#CDEDB3] transition-colors">
+                            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>edit</span>Edit
+                          </button>
+                          <button onClick={() => handleDelete(med.id, med.name)}
+                            className="flex items-center gap-1 px-3 py-1.5 text-[11px] font-medium rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors">
+                            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>delete</span>Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
           </div>
         )}
 
-        {/* ─── TAB: ADD / UPLOAD ─── */}
+        {/* ── TAB: Add / Upload ── */}
         {activeTab === 'actions' && (
-          <div className="bento-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))' }}>
-            
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
             {/* Single Entry */}
-            <div className="clinical-card">
-              <h3 className="title-md" style={{ marginBottom: '24px' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: '20px', verticalAlign: 'middle', marginRight: '8px', color: 'var(--primary)' }}>add_circle</span>
-                Single Formulary Entry
-              </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <div className="ghost-input-container">
-                  <label className="label-sm">Medicine Name</label>
-                  <input type="text" className="ghost-input" placeholder="e.g., Crocin 500" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+            <div className="bg-white border border-[rgba(8,71,52,0.1)] rounded-2xl p-7 shadow-sm">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-9 h-9 rounded-xl bg-[#CDEDB3] flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[#084734]" style={{ fontSize: 20 }}>add_circle</span>
                 </div>
-                <div className="ghost-input-container">
-                  <label className="label-sm">Active Composition</label>
-                  <input type="text" className="ghost-input" placeholder="e.g., Paracetamol" value={formData.composition} onChange={(e) => setFormData({...formData, composition: e.target.value})} />
-                </div>
-                <div className="ghost-input-container">
-                  <label className="label-sm">Manufacturer</label>
-                  <input type="text" className="ghost-input" placeholder="e.g., GSK" value={formData.manufacturer} onChange={(e) => setFormData({...formData, manufacturer: e.target.value})} />
-                </div>
-                <div className="ghost-input-container">
-                  <label className="label-sm">Retail Price ($)</label>
-                  <input type="text" className="ghost-input" placeholder="0.00" value={formData.price} onChange={(e) => setFormData({...formData, price: e.target.value})} />
-                </div>
-                <button className="btn-primary" onClick={handleSingleSubmit} disabled={status?.type === 'loading'}>
+                <h3 className="font-serif text-lg text-[#084734]">Single Formulary Entry</h3>
+              </div>
+              <div className="flex flex-col gap-4">
+                {[
+                  { label: 'Medicine Name',      key: 'name',         placeholder: 'e.g., Crocin 500' },
+                  { label: 'Active Composition',  key: 'composition',  placeholder: 'e.g., Paracetamol' },
+                  { label: 'Manufacturer',        key: 'manufacturer', placeholder: 'e.g., GSK' },
+                  { label: 'Retail Price ($)',    key: 'price',        placeholder: '0.00' },
+                ].map(({ label, key, placeholder }) => (
+                  <div key={key}>
+                    <label className="block text-[10px] font-semibold uppercase tracking-widest text-[#3a6652] mb-1.5">{label}</label>
+                    <input type="text" placeholder={placeholder} value={formData[key]}
+                      onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
+                      className={inputCls} />
+                  </div>
+                ))}
+                <button onClick={handleSingleSubmit} disabled={status?.type === 'loading'}
+                  className="mt-2 w-full bg-[#084734] text-[#CEF17B] text-xs font-semibold uppercase tracking-widest py-3 rounded-xl hover:bg-[#0a5c44] disabled:opacity-50 transition-colors">
                   Sync with Repository
                 </button>
               </div>
             </div>
 
             {/* Bulk Upload */}
-            <div className="clinical-card" style={{ backgroundColor: 'var(--secondary-container)', border: '1px solid var(--outline-variant)' }}>
-              <h3 className="title-md" style={{ color: 'var(--on-secondary-container)', marginBottom: '8px' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: '20px', verticalAlign: 'middle', marginRight: '8px', color: 'var(--primary)' }}>cloud_upload</span>
-                Bulk Molecular Sync
-              </h3>
-              <p className="body-sm" style={{ color: 'var(--on-secondary-container)', marginBottom: '24px' }}>
+            <div className="bg-[#f0fbe8] border border-[rgba(8,71,52,0.12)] rounded-2xl p-7 shadow-sm flex flex-col gap-5">
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 rounded-xl bg-[#CDEDB3] flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[#084734]" style={{ fontSize: 20 }}>cloud_upload</span>
+                </div>
+                <h3 className="font-serif text-lg text-[#084734]">Bulk Molecular Sync</h3>
+              </div>
+              <p className="text-xs text-[#3a6652] -mt-2 leading-relaxed">
                 Upload a CSV file. System auto-discovers and links pharmacological substitutes.
               </p>
-              
-              <label style={{
-                display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
-                height: '200px', border: '2px dashed var(--outline-variant)', borderRadius: 'var(--radius-lg)',
-                backgroundColor: 'var(--surface)', cursor: 'pointer', transition: 'border-color 0.2s', padding: '24px', textAlign: 'center'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--primary)'}
-              onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--outline-variant)'}>
-                <span className="material-symbols-outlined" style={{ fontSize: '48px', color: 'var(--primary)', marginBottom: '12px' }}>cloud_upload</span>
-                <span className="title-md" style={{ color: 'var(--on-surface)', marginBottom: '4px' }}>{fileName ? 'File Selected' : 'Select CSV File'}</span>
-                <span className="body-sm" style={{ color: 'var(--on-surface-variant)' }}>{fileName || 'name, composition, manufacturer, price'}</span>
-                <input type="file" accept=".csv" style={{ display: 'none' }} onChange={handleFileChange} />
+
+              <label className="flex flex-col items-center justify-center h-48 border-2 border-dashed border-[rgba(8,71,52,0.2)] rounded-2xl bg-white cursor-pointer hover:border-[#084734] hover:bg-[#CDEDB3]/20 transition-all text-center px-6">
+                <span className="material-symbols-outlined text-[#084734] mb-2" style={{ fontSize: 40 }}>cloud_upload</span>
+                <span className="text-sm font-semibold text-[#084734]">{fileName ? 'File Selected' : 'Select CSV File'}</span>
+                <span className="text-xs text-[#3a6652] mt-1">{fileName || 'name, composition, manufacturer, price'}</span>
+                <input type="file" accept=".csv" className="hidden" onChange={handleFileChange} />
               </label>
 
-              <button className="btn-primary" style={{ width: '100%', marginTop: '20px' }} onClick={handleBulkUpload} disabled={status?.type === 'loading' || !csvData.trim()}>
+              <button onClick={handleBulkUpload} disabled={status?.type === 'loading' || !csvData.trim()}
+                className="w-full bg-[#084734] text-[#CEF17B] text-xs font-semibold uppercase tracking-widest py-3 rounded-xl hover:bg-[#0a5c44] disabled:opacity-40 transition-colors">
                 Parse & Automate Linkages
               </button>
 
               {summary && (
-                <div style={{ marginTop: '20px', padding: '16px', background: 'white', borderRadius: 'var(--radius-md)', border: '1px solid var(--outline-variant)' }}>
-                  <div className="label-sm" style={{ marginBottom: '12px', fontWeight: 700 }}>Processing Summary</div>
-                  <div style={{ display: 'flex', gap: '24px' }}>
-                    <div><span className="label-sm">Total: </span><span className="title-md">{summary.total}</span></div>
-                    <div><span className="label-sm">Synced: </span><span className="title-md" style={{ color: 'var(--primary)' }}>{summary.inserted}</span></div>
-                    <div><span className="label-sm">Failed: </span><span className="title-md" style={{ color: '#c62828' }}>{summary.failed}</span></div>
+                <div className="bg-white border border-[rgba(8,71,52,0.1)] rounded-xl p-4">
+                  <div className="text-[10px] font-semibold uppercase tracking-widest text-[#3a6652] mb-3">Processing Summary</div>
+                  <div className="flex gap-6">
+                    {[
+                      { label: 'Total',  value: summary.total,    color: '#084734' },
+                      { label: 'Synced', value: summary.inserted, color: '#084734' },
+                      { label: 'Failed', value: summary.failed,   color: '#dc2626' },
+                    ].map(({ label, value, color }) => (
+                      <div key={label}>
+                        <div className="text-[10px] text-[#3a6652] uppercase tracking-wide">{label}</div>
+                        <div className="font-serif text-2xl" style={{ color }}>{value}</div>
+                      </div>
+                    ))}
                   </div>
                   {summary.errors?.length > 0 && (
-                    <div style={{ marginTop: '12px', fontSize: '0.75rem', color: '#c62828', maxHeight: '80px', overflowY: 'auto' }}>
+                    <div className="mt-3 text-xs text-red-600 max-h-20 overflow-y-auto">
                       {summary.errors.map((err, i) => <div key={i}>{err.record}: {err.error}</div>)}
                     </div>
                   )}
@@ -369,77 +358,75 @@ function AdminPage() {
             </div>
           </div>
         )}
-
       </div>
 
-      {/* ─── EDIT MODAL ─── */}
+      {/* ── Edit Modal ── */}
       {editModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }} onClick={() => setEditModal(null)}>
-          <div className="clinical-card" style={{ width: '480px', maxWidth: '90vw', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h3 className="title-md">Edit Medicine</h3>
-              <button onClick={() => setEditModal(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--on-surface-variant)' }}>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4" onClick={() => setEditModal(null)}>
+          <div className="bg-white rounded-2xl p-7 w-full max-w-md shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-serif text-lg text-[#084734]">Edit Medicine</h3>
+              <button onClick={() => setEditModal(null)} className="text-[#3a6652] hover:text-[#084734] transition-colors">
                 <span className="material-symbols-outlined">close</span>
               </button>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div className="ghost-input-container">
-                <label className="label-sm">Name</label>
-                <input type="text" className="ghost-input" value={editForm.name} onChange={(e) => setEditForm({...editForm, name: e.target.value})} />
-              </div>
-              <div className="ghost-input-container">
-                <label className="label-sm">Composition</label>
-                <input type="text" className="ghost-input" value={editForm.composition} onChange={(e) => setEditForm({...editForm, composition: e.target.value})} />
-              </div>
-              <div className="ghost-input-container">
-                <label className="label-sm">Manufacturer</label>
-                <input type="text" className="ghost-input" value={editForm.manufacturer} onChange={(e) => setEditForm({...editForm, manufacturer: e.target.value})} />
-              </div>
-              <div className="ghost-input-container">
-                <label className="label-sm">Price ($)</label>
-                <input type="text" className="ghost-input" value={editForm.price} onChange={(e) => setEditForm({...editForm, price: e.target.value})} />
-              </div>
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                <button onClick={() => setEditModal(null)} className="btn-primary" style={{ background: 'var(--surface-container-high)', color: 'var(--primary)', boxShadow: 'none' }}>Cancel</button>
-                <button onClick={handleEditSubmit} className="btn-primary">Save Changes</button>
+            <div className="flex flex-col gap-4">
+              {['name', 'composition', 'manufacturer', 'price'].map((key) => (
+                <div key={key}>
+                  <label className="block text-[10px] font-semibold tracking-widest text-[#3a6652] mb-1.5 capitalize">{key}</label>
+                  <input type="text" value={editForm[key]}
+                    onChange={(e) => setEditForm({ ...editForm, [key]: e.target.value })}
+                    className={inputCls} />
+                </div>
+              ))}
+              <div className="flex gap-3 justify-end mt-2">
+                <button onClick={() => setEditModal(null)}
+                  className="px-5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-widest border border-[rgba(8,71,52,0.2)] text-[#084734] hover:bg-[#CDEDB3] transition-colors">
+                  Cancel
+                </button>
+                <button onClick={handleEditSubmit}
+                  className="px-5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-widest bg-[#084734] text-[#CEF17B] hover:bg-[#0a5c44] transition-colors">
+                  Save Changes
+                </button>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* ─── SUBSTITUTE MODAL ─── */}
+      {/* ── Substitute Modal ── */}
       {subModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }} onClick={() => setSubModal(null)}>
-          <div className="clinical-card" style={{ width: '520px', maxWidth: '90vw', maxHeight: '80vh', display: 'flex', flexDirection: 'column', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 className="title-md">
-                <span className="material-symbols-outlined" style={{ fontSize: '20px', verticalAlign: 'middle', marginRight: '8px', color: 'var(--primary)' }}>hub</span>
-                Substitutes for {subModal.name}
-              </h3>
-              <button onClick={() => setSubModal(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--on-surface-variant)' }}>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4" onClick={() => setSubModal(null)}>
+          <div className="bg-white rounded-2xl p-7 w-full max-w-lg max-h-[80vh] flex flex-col shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[#084734]" style={{ fontSize: 20 }}>hub</span>
+                <h3 className="font-serif text-lg text-[#084734]">Substitutes for {subModal.name}</h3>
+              </div>
+              <button onClick={() => setSubModal(null)} className="text-[#3a6652] hover:text-[#084734] transition-colors">
                 <span className="material-symbols-outlined">close</span>
               </button>
             </div>
-            
-            <div style={{ flex: 1, overflowY: 'auto' }}>
+
+            <div className="flex-1 overflow-y-auto">
               {subsLoading ? (
-                <div style={{ padding: '40px', textAlign: 'center', color: 'var(--on-surface-variant)' }}>Loading...</div>
+                <div className="py-12 text-center text-[#3a6652] text-sm">Loading...</div>
               ) : subs.length === 0 ? (
-                <div style={{ padding: '40px', textAlign: 'center', color: 'var(--on-surface-variant)' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '48px', display: 'block', marginBottom: '12px', color: 'var(--outline-variant)' }}>link_off</span>
-                  No substitute links found.
+                <div className="py-12 text-center">
+                  <span className="material-symbols-outlined text-[#CDEDB3] block mb-3" style={{ fontSize: 48 }}>link_off</span>
+                  <p className="text-sm text-[#3a6652]">No substitute links found.</p>
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div className="flex flex-col gap-2">
                   {subs.map(sub => (
-                    <div key={sub.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'var(--surface-container-low)', borderRadius: 'var(--radius-md)', border: '1px solid var(--outline-variant)' }}>
+                    <div key={sub.id} className="flex items-center justify-between px-4 py-3 bg-[#f7fbf4] border border-[rgba(8,71,52,0.08)] rounded-xl">
                       <div>
-                        <div className="body-md" style={{ fontWeight: 600, color: 'var(--on-surface)' }}>{sub.name}</div>
-                        <div className="label-sm">{sub.manufacturer} · ${sub.price}</div>
+                        <div className="text-sm font-semibold text-[#084734]">{sub.name}</div>
+                        <div className="text-[11px] text-[#3a6652]">{sub.manufacturer} · ${sub.price}</div>
                       </div>
-                      <button onClick={() => handleRemoveSub(sub.id)} style={{ background: 'none', border: '1px solid #ef9a9a', borderRadius: 'var(--radius-sm)', padding: '6px 10px', cursor: 'pointer', color: '#c62828', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem' }}>
-                        <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>link_off</span>Unlink
+                      <button onClick={() => handleRemoveSub(sub.id)}
+                        className="flex items-center gap-1 px-3 py-1.5 text-[11px] font-medium rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors">
+                        <span className="material-symbols-outlined" style={{ fontSize: 14 }}>link_off</span>Unlink
                       </button>
                     </div>
                   ))}
@@ -449,8 +436,8 @@ function AdminPage() {
           </div>
         </div>
       )}
-
     </div>
+    </>
   );
 }
 

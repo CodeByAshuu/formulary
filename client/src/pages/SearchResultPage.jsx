@@ -31,7 +31,29 @@ function SearchResultPage() {
     }
   };
 
+  const styles = `
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --primary: #084734;
+    --accent: #CEF17B;
+    --bg-soft: #CDEDB3;
+    --bg-page: #f0f9ea;
+    --text-main: #0c2e22;
+    --text-muted: #3a6652;
+    --border: rgba(8,71,52,0.12);
+  }
+    .hero-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.8rem, 6vw, 4.2rem);
+      color: #ffffff; line-height: 1.05;
+      position: relative; z-index: 1; margin-bottom: 20px;
+    }
+    .hero-title em { font-style: italic; color: var(--accent); }
+  `;
+
   return (
+    <><style>{styles}</style>
     <div className="min-h-screen bg-[#CDEDB3]">
 
       {/* ── Hero Header ── */}
@@ -39,11 +61,11 @@ function SearchResultPage() {
         {/* blob */}
         <div className="absolute -top-28 -right-16 w-96 h-96 rounded-full bg-[radial-gradient(circle,rgba(206,241,123,0.13)_0%,transparent_70%)] pointer-events-none" />
         {/* bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-b from-transparent to-[#CDEDB3] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 right-0 h-12 bg-linear-to-b from-transparent to-[#CDEDB3] pointer-events-none" />
 
         {/* title row */}
         <div className="relative z-10 flex items-center gap-3 mb-5">
-          <h1 className="font-serif text-2xl text-white tracking-wide">Formu<em class="text-[#CEF17B]">lary</em> Search</h1>
+          <h1 className="hero-title">Formu<em class="text-[#CEF17B]">lary</em> Search</h1>
           <span className="text-[10px] font-semibold uppercase tracking-widest bg-[rgba(206,241,123,0.15)] border border-[rgba(206,241,123,0.35)] text-[#CEF17B] px-3 py-1 rounded-full">
             Clinical View
           </span>
@@ -91,7 +113,7 @@ function SearchResultPage() {
                 className="group relative bg-white border border-[rgba(8,71,52,0.1)] rounded-2xl p-6 flex flex-col gap-4 shadow-sm hover:-translate-y-1 hover:shadow-lg transition-all overflow-hidden"
               >
                 {/* accent bar */}
-                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#084734] to-[#CEF17B] opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute top-0 left-0 right-0 h-0.75 bg-linear-to-r from-[#084734] to-[#CEF17B] opacity-0 group-hover:opacity-100 transition-opacity" />
 
                 {/* name + composition */}
                 <div>
@@ -137,6 +159,7 @@ function SearchResultPage() {
         )}
       </div>
     </div>
+    </>
   );
 }
 
