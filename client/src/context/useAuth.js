@@ -1,8 +1,9 @@
-import { useContext } from 'react';
-import { AuthContext } from './AuthContext';
+import { useContext, createContext } from 'react';
 
-// Separated from AuthContext.jsx so that file only exports a component
-// (AuthProvider), satisfying the react-refresh/only-export-components rule.
+// The context instance lives here (a plain .js file) so AuthContext.jsx can
+// export only the AuthProvider component, satisfying react-refresh/only-export-components.
+export const AuthContext = createContext();
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
