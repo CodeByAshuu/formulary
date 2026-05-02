@@ -2,34 +2,52 @@
 
 ![Formulary Preview](docs/images/image.png)
 
-## Overview & Problem Statement
-Healthcare costs are a significant burden for many individuals. A major contributing factor is the lack of transparency regarding cheaper, generic substitute medicines that share the exact same clinical formula as expensive brand-name drugs. 
+## Overview
+**Formulary** is a backend-driven healthcare platform that enables users to search medicines, discover equivalent substitutes, and compare prices to identify cost-effective alternatives.
 
-**Formulary** is a web platform designed to solve this problem. It allows users to search for their prescribed medications and instantly view highly detailed profiles of the drug, alongside a list of cost-effective, chemically identical substitutes. 
+The system is designed as a read-heavy, high-performance API, optimized using caching and efficient database querying.
+
+## Problem
+Patients often pay higher prices for branded medicines due to lack of visibility into cheaper substitutes with identical compositions.
 
 ## Solution
-The application features a "Clinical Atelier" premium UI on the frontend, focusing on a minimal, editorial, and highly readable design. On the backend, it utilizes a robust Node.js, PostgreSQL, and Redis stack to quickly query a vast database of medicines and return price-optimized substitute recommendations in milliseconds.
+Formulary provides:
+
+- Fast medicine search
+- Substitute discovery using composition-based mapping
+- Price comparison across equivalent medicines
+- Admin-controlled data management with bulk uploads
 
 ## Tech Stack
 - **Frontend**: React, TailwindCSS
 - **Backend**: Node.js, Express
 - **Database**: PostgreSQL
 - **Caching**: Redis
+- **Containerization** : Docker, Docker Compose
+- **CI/CD** : GitHub Actions
 
 ## Performance Improvements (Redis Caching)
 To handle a read-heavy load, we implemented a robust Redis caching layer on our search and substitute APIs.
 
-**Before Redis (Direct DB Queries):**
-- Search Response: ~199ms
-  ![Before Redis 1](docs/images/199ms.png)
-- Substitute Response: ~125ms
-  ![Before Redis 2](docs/images/125ms.png)
 
-**After Redis (Cache Hits):**
-- Search Response: ~7ms
-  ![After Redis 1](docs/images/7ms.png)
-- Substitute Response: ~15ms
-  ![After Redis 2](docs/images/15ms.png)
+| Endpoint    | Before (DB) | After (Cache) | Improvement |
+| ----------- | ----------- | ------------- | ----------- |
+| Search      | ~80–200 ms  | ~7–12 ms      | ~85% faster |
+| Substitutes | ~120 ms     | ~10–20 ms     | ~80% faster |
+
+<h3>Before Redis (Direct DB Queries)</h3>
+
+<p>
+  <img src="docs/images/199ms.png" width="48%" />
+  <img src="docs/images/125ms.png" width="48%" />
+</p>
+
+<h3>After Redis (Cache Hits)</h3>
+
+<p>
+  <img src="docs/images/7ms.png" width="48%" />
+  <img src="docs/images/15ms.png" width="48%" />
+</p>
 
 ---
 
@@ -91,8 +109,8 @@ Running Redis via Docker ensures a clean environment without system-level instal
    ```
 5. Clear Cache (everything)
    ```bash
-   docker exec -it formulary-redis redis-cli
-   ```
+    FLUSHALL
+    ```
 
 ### Method 2: Native Redis Server (Windows/Mac/Linux)
 1. **Windows**: Install using WSL (Windows Subsystem for Linux) and run:
@@ -113,3 +131,42 @@ Running Redis via Docker ensures a clean environment without system-level instal
    ```
 
 Once running locally, the application will automatically connect to the default port `6379`.
+
+## Key Features
+
+* High-performance search with indexing
+* Redis caching with TTL and invalidation
+* Bulk CSV upload for medicines
+* Automatic substitute linking using composition
+* Secure admin APIs with JWT authentication
+* Containerized deployment
+
+---
+
+## CI/CD
+
+* CI pipeline:
+
+  * Linting + dependency install
+  * PostgreSQL + Redis service containers
+  * Backend smoke test
+
+* CD pipeline:
+
+  * Docker image build
+  * Push to GitHub Container Registry (GHCR)
+
+---
+
+## Future Improvements
+
+* Fuzzy search (typo tolerance)
+* Advanced filtering (price range, manufacturer)
+* Rate limiting
+* Observability (logs, metrics)
+
+---
+
+## Author
+
+Sagar Sahu
