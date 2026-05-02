@@ -1,20 +1,90 @@
 version: '3.8'
+
 services:
+  # ─── PostgreSQL Database
   db:
-    image: postgres:15
+    image: postgres:15-alpine
+    container_name: formulary-db
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: yourpassword
-      POSTGRES_DB: healthcare_db
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-healthcare_db}
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      # Run schema on first init
+      - ./server/src/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-healthcare_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  # ─── Redis Cache
   redis:
-    image: redis:6-alpine
+    image: redis:7-alpine
+    container_name: formulary-redis
+    restart: unless-stopped
     ports:
       - "6379:6379"
+    volumes:
+      - redisdata:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  # ─── Node.js Backend
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: formulary-server
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      PORT: 5000
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_NAME: ${DB_NAME:-healthcare_db}
+      # Use the docker service name 'db' instead of localhost
+      DB_HOST: db
+      DB_PORT: 5432
+      # Use the docker service name 'redis' instead of localhost
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-changeme_jwt_secret}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@formulary.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+    ports:
+      - "5000:5000"
+    volumes:
+      # Mount CSV for seeding without rebuilding image
+      - ./medicine_100.csv:/app/medicine_100.csv:ro
+
+  # ─── React / Vite Frontend
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        # Pass the backend URL at build time so Vite bakes it in
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:5000}
+    container_name: formulary-client
+    restart: unless-stopped
+    depends_on:
+      - server
+    ports:
+      - "80:80"
+
+# ─── Named Volumes
 volumes:
   pgdata:
+  redisdata:

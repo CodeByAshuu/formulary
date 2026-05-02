@@ -23,10 +23,10 @@ dist-ssr
 *.sln
 *.sw?
 
-# env files
+# env files — commit the example template, ignore everything else
 .env
 .env.local
-.env.example
 .env.test
 .env.production
 .env.development
+!.env.example
