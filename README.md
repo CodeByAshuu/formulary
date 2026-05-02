@@ -37,7 +37,7 @@ To handle a read-heavy load, we implemented a robust Redis caching layer on our 
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/your-username/formulary.git
+git clone https://github.com/CodeByAshuu/formulary.git
 cd formulary
 ```
 
@@ -49,9 +49,15 @@ npm install
 - Create a `.env` file in the `server` directory with your Postgres and Redis credentials.
 ```env
 PORT=5000
-DATABASE_URL=postgres://user:password@localhost:5432/formulary
+DB_USER=postgres
+DB_PASSWORD=password
+DB_NAME=formulary_db
+DB_HOST=localhost
+DB_PORT=5432
 REDIS_URL=redis://localhost:6379
-JWT_SECRET=your_super_secret_key
+JWT_SECRET= your_secret_key
+ADMIN_PASSWORD=admin
+ADMIN_EMAIL=admin@example.com
 ```
 - Seed the database (if applicable) and start the server:
 ```bash
@@ -79,6 +85,14 @@ Running Redis via Docker ensures a clean environment without system-level instal
    docker run -d --name formulary-redis -p 6379:6379 redis
    ```
 3. The server will automatically connect to `redis://localhost:6379`.
+4. Open Redis CLI inside container
+    ```bash
+   docker exec -it formulary-redis redis-cli
+   ```
+5. Clear Cache (everything)
+   ```bash
+   docker exec -it formulary-redis redis-cli
+   ```
 
 ### Method 2: Native Redis Server (Windows/Mac/Linux)
 1. **Windows**: Install using WSL (Windows Subsystem for Linux) and run:
