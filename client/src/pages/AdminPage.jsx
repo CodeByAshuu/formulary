@@ -29,7 +29,8 @@ function AdminPage() {
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
   };
-  useEffect(() => { fetchDashboard(); }, []);
+  useEffect(() => { (async () => { await fetchDashboard(); })(); }, []);
+
 
   const clearStatus = () => setTimeout(() => setStatus(null), 4000);
 

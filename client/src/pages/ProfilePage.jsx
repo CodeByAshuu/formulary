@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { getProfile, updateProfile } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 
 const ProfilePage = () => {
   const { user, logout, refreshUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({ firstName: '', lastName: '' });
+  // Initialise directly from user — the !user guard below ensures user is
+  // always defined by the time this hook result is consumed, so no effect needed.
+  const [formData, setFormData] = useState({
+    firstName: user?.first_name || '',
+    lastName:  user?.last_name  || '',
+  });
   const [updateLoading, setUpdateLoading] = useState(false);
   const [msg, setMsg] = useState({ type: '', text: '' });
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (user) {
-      setFormData({ firstName: user.first_name || '', lastName: user.last_name || '' });
-    }
-  }, [user]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

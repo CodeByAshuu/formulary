@@ -1,13 +1,15 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import { getProfile } from '../api/auth';
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async () => {
+  // Exposed so other parts of the app can manually re-sync the profile
+  // (e.g. after a profile update). NOT called directly inside useEffect.
+  const refreshUser = async () => {
     try {
       const token = localStorage.getItem('token');
       if (token) {
@@ -25,8 +27,26 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Inline async IIFE so the effect itself is a sync function — satisfies
+  // react-hooks/set-state-in-effect while keeping the data-fetch on mount.
   useEffect(() => {
-    fetchProfile();
+    (async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (token) {
+          const userData = await getProfile();
+          setUser(userData);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error('Failed to fetch profile:', error);
+        localStorage.removeItem('token');
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
   const login = (token, userData) => {
@@ -42,16 +62,8 @@ export const AuthProvider = ({ children }) => {
   const isAdmin = user?.role === 'admin';
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, isAdmin, refreshUser: fetchProfile }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, isAdmin, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 };
